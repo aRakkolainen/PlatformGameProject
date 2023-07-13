@@ -48,7 +48,7 @@ export default class LevelScene1 extends Phaser.Scene {
   }
   create(gameData) {
     let div = document.getElementById("gameContainer");
-      div.style.background = "linear-gradient(#113388, #114488, #553388, #594488, #773388, #993388,#652244, #673346)";
+    div.style.background = "linear-gradient(#113388, #114488, #553388, #594488, #773388, #993388,#652244, #673346)";
     this.data = gameData;
     gameConfig =  gameData.config;
     gameWidth = gameConfig.scale.width; 

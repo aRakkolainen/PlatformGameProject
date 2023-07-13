@@ -29,7 +29,7 @@ export default class LevelScene2 extends Phaser.Scene {
       
       //This is based on this website: https://stackoverflow.com/questions/59332460/how-to-set-background-color-of-phaser-3-game-during-runtime
       let div = document.getElementById("gameContainer");
-      div.style.background = "#114488";
+      div.style.background = div.style.background = "linear-gradient(#113388, #114488, #247899)";
       
 
 
@@ -46,9 +46,12 @@ export default class LevelScene2 extends Phaser.Scene {
       this.info = this.add.text(gameWidth-420, 5, "Collect at least 100 points to win!", {fontSize:"20px", fill: "#ffffff", fontStyle:"bold"})
       this.text = this.add.text(25, 5, "SCORE: ", {fontSize:"25px", fill: "#ffffff", fontStyle:"bold"})
       this.scoreText = this.add.text(115, 5, "0", {fontSize:"25px", fill: "#0000000", fontStyle: "bold"})
+      this.cursors = this.input.keyboard.createCursorKeys();
     }
 
     update() {
-        
+      if (this.cursors.space.isDown) {
+        this.scene.start("LevelScene3", gameData);
+    }
     }
 }
