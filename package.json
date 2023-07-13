@@ -1,0 +1,22 @@
+{
+    "name": "week7",
+    "version": "1.0.0",
+    "description": "",
+    "scripts": {
+        "start": "parcel game.html",
+        "build": "parcel build game.html"
+    },
+    "dependencies": {
+        "parcel": "^2.9.3",
+        "phaser": "^3.60.0"
+    },
+    "devDependencies": {
+        "@babel/core": "7.2.0",
+        "process": "^0.11.10",
+        "typescript": "4.4.4"
+    },
+    "resolutions": {
+        "@babel/preset-env": "7.13.8"
+    },
+    "keywords": []
+}
