@@ -6,7 +6,7 @@ export default class StartScene extends Phaser.Scene {
         super("StartScene");
     }
     preload() {
-        this.load.image("start", "./assets/");
+        //this.load.image("start", "./assets/");
     }
 
     create (data) {
