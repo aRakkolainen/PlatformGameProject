@@ -27,7 +27,7 @@ export default class LevelScene2 extends Phaser.Scene {
       gameHeight = gameConfig.scale.height; 
       gameOptions = gameData.options;
       
-      //This is based on this website: 
+      //This is based on this website: https://stackoverflow.com/questions/59332460/how-to-set-background-color-of-phaser-3-game-during-runtime
       let div = document.getElementById("gameContainer");
       div.style.background = "#114488";
       
