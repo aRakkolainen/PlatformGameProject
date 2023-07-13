@@ -52,7 +52,7 @@ const gameOptions = {
 
 export default class LevelScene1 extends Phaser.Scene { 
   constructor() {
-    super({key: "LevelScene1", phaserConfig});
+    super("LevelScene1");
     this.score=0;
   }
   preload() {
@@ -78,7 +78,8 @@ export default class LevelScene1 extends Phaser.Scene {
     );
   
   }
-  create() {
+  create(data) {
+    this.phaserConfig = data.phaserConfig; 
     //The platform: 
     this.platformGroup = this.physics.add.group({
       immovable: true,
@@ -274,7 +275,7 @@ export default class LevelScene1 extends Phaser.Scene {
       this.info.setText("You won!")
       this.player.body.velocity.x = 0; 
       this.player.body.velocity.y = 0; 
-      setTimeout(() => {this.scene.start("PlayGame"),this.score=0}, 60);
+      this.scene.start("LevelScene2", phaserConfig);
 
     }
   }
@@ -368,7 +369,7 @@ export default class LevelScene1 extends Phaser.Scene {
 
     if (this.score >= 100) {
       this.info.setText = "YOU GOT OVER 100 POINTS!";
-      setTimeout(() => {this.scene.start("PlayGame"),this.score=0}, 10);
+      setTimeout(() => {this.scene.start("LevelScene2", phaserConfig),this.score=0}, 10);
     }
 
   }

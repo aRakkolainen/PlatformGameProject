@@ -2,7 +2,7 @@ import Phaser from "phaser";
 
 export default class FinishScene extends Phaser.Scene { 
     constructor() {
-      super({key: "FinishScene" });
+      super("FinishScene");
       //this.score=0;
     }
     preload() {
