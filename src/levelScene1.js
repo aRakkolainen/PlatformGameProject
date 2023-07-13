@@ -12,43 +12,11 @@
 //import "./styles.css";
 //let game; 
 import Phaser from "phaser";
-
-const gameOptions = {
-  playerGravity: 800,
-  playerSpeed: 300
-};
-
-/*window.onload = function() {
-  let gameConfig = {
-    type: Phaser.AUTO,
-    //background: "#454545",
-    //background: "linear-gradient(#0d1554, #5ba4ff)",
-    scale: {
-      mode: Phaser.Scale.Fit,
-      autoCenter: Phaser.Scale.CENTER_BOTH,
-      width: 800,
-      height: 1000
-    },
-    parent: 'gameContainer',
-    transparent: true,
-    pixelArt: true,
-    physics: {
-      default: "arcade",
-      debug: false,
-      arcade: {
-        gravity: {
-          y: 0
-        }
-      }
-    },
-    scene: PlayGame
-  };
-  game = new Phaser.Game(gameConfig);
-  window.focus();
-}
-*/
-
-
+let data;
+let gameConfig;
+let gameOptions; 
+let gameWidth; 
+let gameHeight; 
 
 export default class LevelScene1 extends Phaser.Scene { 
   constructor() {
@@ -78,8 +46,14 @@ export default class LevelScene1 extends Phaser.Scene {
     );
   
   }
-  create(data) {
-    this.phaserConfig = data.phaserConfig; 
+  create(gameData) {
+    let div = document.getElementById("gameContainer");
+      div.style.background = "linear-gradient(#113388, #114488, #553388, #594488, #773388, #993388,#652244, #673346)";
+    this.data = gameData;
+    gameConfig =  gameData.config;
+    gameWidth = gameConfig.scale.width; 
+    gameHeight = gameConfig.scale.height; 
+    gameOptions = gameData.options; 
     //The platform: 
     this.platformGroup = this.physics.add.group({
       immovable: true,
@@ -106,30 +80,30 @@ export default class LevelScene1 extends Phaser.Scene {
     );
 
   
-    this.startplatform = this.physics.add.staticSprite(game.config.width/2, game.config.height/(1/0.87), "platform");
-    this.endPlatform = this.physics.add.staticSprite(game.config.width-100, game.config.height-850, "platform");
-    this.finish = this.physics.add.staticSprite(game.config.width-75, game.config.height-910, "finish_line")
+    this.startplatform = this.physics.add.staticSprite(gameWidth/2, gameHeight/(1/0.87), "platform");
+    this.endPlatform = this.physics.add.staticSprite(gameWidth-100, gameHeight-850, "platform");
+    this.finish = this.physics.add.staticSprite(gameWidth-75, gameHeight-910, "finish_line")
   
     let platformNum = Phaser.Math.Between(3, 15);
     let smallPlatformNum = Phaser.Math.Between(3, 20);
     for(let i = 0; i < platformNum; i++) {
-      this.platformGroup.create(Phaser.Math.Between(30, game.config.width), Phaser.Math.Between(210, game.config.height), "platform");
+      this.platformGroup.create(Phaser.Math.Between(30, gameWidth), Phaser.Math.Between(210, gameHeight), "platform");
   }
   //this.cactus.create(Phaser.Math.Between(30, game.config.width), Phaser.Math.Between(210, game.config.height), "cactus")
   let cactusPlatformNum = Phaser.Math.Between(0, 15);
   let cactusNum = Phaser.Math.Between(0, 10);
   for (let i=0; i< cactusPlatformNum; i++) {
-    this.cactusPlatformGroup.create(Phaser.Math.Between(30, game.config.width), Phaser.Math.Between(210, game.config.height), "cactusPlatform")
+    this.cactusPlatformGroup.create(Phaser.Math.Between(30, gameWidth), Phaser.Math.Between(210, gameHeight), "cactusPlatform")
   }
   for (let i=0; i < cactusNum; i++) {
-    this.cactusGroup.create(Phaser.Math.Between(30, game.config.width), Phaser.Math.Between(210, game.config.height), "cactus");
+    this.cactusGroup.create(Phaser.Math.Between(30, gameWidth), Phaser.Math.Between(210, gameHeight), "cactus");
   }
     for(let i = 0; i < smallPlatformNum; i++) {
-    this.smallPlatformGroup.create(Phaser.Math.Between(210, game.config.width), Phaser.Math.Between(180, game.config.height), "small_platform");
+    this.smallPlatformGroup.create(Phaser.Math.Between(210, gameWidth), Phaser.Math.Between(180, gameHeight), "small_platform");
 }
 
     //this.physics.add.overlap(this.startplatform, this.platformGroup)
-    this.player = this.physics.add.sprite(game.config.width/2, game.config.height/(1/0.80), "player")
+    this.player = this.physics.add.sprite(gameWidth/2, gameHeight/(1/0.80), "player")
     this.player.body.gravity.y = gameOptions.playerGravity;
     this.physics.add.collider(this.player, this.platformGroup);
     this.physics.add.collider(this.player, this.smallPlatformGroup);
@@ -154,19 +128,19 @@ export default class LevelScene1 extends Phaser.Scene {
     this.physics.add.collider(this.bluePopsicleGroup, this.smallPlatformGroup);
 
     for (let i=0; i < 15; i++) {
-      this.yellowPopsicleGroup.create(Phaser.Math.Between(30, game.config.width), Phaser.Math.Between(210, game.config.height), "popsicle1")
+      this.yellowPopsicleGroup.create(Phaser.Math.Between(30, gameWidth), Phaser.Math.Between(210, gameHeight), "popsicle1")
     }
 
     for (let i=0; i < 10; i++) {
-      this.pinkPopsicleGroup.create(Phaser.Math.Between(30, game.config.width), Phaser.Math.Between(210, game.config.height), "popsicle2")
+      this.pinkPopsicleGroup.create(Phaser.Math.Between(30, gameWidth), Phaser.Math.Between(210, gameHeight), "popsicle2")
     }
 
     for (let i=0; i < 5; i++) {
-      this.whitePopsicleGroup.create(Phaser.Math.Between(30, game.config.width), Phaser.Math.Between(210, game.config.height), "popsicle3")
+      this.whitePopsicleGroup.create(Phaser.Math.Between(30, gameWidth), Phaser.Math.Between(210, gameHeight), "popsicle3")
     }
 
     for (let i = 0; i < 3; i++) {
-      this.bluePopsicleGroup.create(Phaser.Math.Between(30, game.config.width), Phaser.Math.Between(210, game.config.height), "popsicle4")
+      this.bluePopsicleGroup.create(Phaser.Math.Between(30, gameWidth), Phaser.Math.Between(210, gameHeight), "popsicle4")
     }
     //Adding the score board and points
     this.text = this.add.text(25, 5, "SCORE: ", {fontSize:"25px", fill: "#ffffff", fontStyle:"bold"})
@@ -189,13 +163,12 @@ export default class LevelScene1 extends Phaser.Scene {
     this.add.text(220, 120, "Shoot", {fontSize:"18px", fill: "#ffffff"});
     this.add.text(220, 160, "Shoot at still", {fontSize:"18px", fill: "#ffffff"});
     this.shootStill = this.add.image(183, 170, "shootStill");
-    this.info = this.add.text(game.config.width-420, 5, "Collect at least 50 points to win!", {fontSize:"20px", fill: "#ffffff", fontStyle:"bold"})
+    this.info = this.add.text(gameWidth-420, 5, "Collect at least 50 points to win!", {fontSize:"20px", fill: "#ffffff", fontStyle:"bold"})
 
     this.physics.add.overlap(this.player, this.yellowPopsicleGroup, this.collectYellowPopsicle, null, this)
     this.physics.add.overlap(this.player, this.pinkPopsicleGroup, this.collectPinkPopsicle, null, this)
     this.physics.add.overlap(this.player, this.whitePopsicleGroup, this.collectWhitePopsicle, null, this)
     this.physics.add.overlap(this.player, this.bluePopsicleGroup, this.collectBluePopsicle, null, this)
-    this.physics.add.overlap(this.player, this.finish, this.finishLevel, null, this)
     this.physics.add.overlap(this.player, this.cactusGroup, this.cactusAttack, null, this)
     this.physics.add.overlap(this.fireBalls, this.cactusGroup, this.cactusKill, null, this)
     this.physics.add.overlap(this.player, this.cactusPlatformGroup, this.movePlatform, null, this)
@@ -268,14 +241,14 @@ export default class LevelScene1 extends Phaser.Scene {
     this.score +=5;
     this.scoreText.setText(this.score)
   }
-  finishLevel(player, start) {
+  finishLevel(player, start, gameData) {
     if (this.score < 50) {
       this.info.setText("Collect more points")
     } else if (this.score >= 50){
       this.info.setText("You won!")
       this.player.body.velocity.x = 0; 
       this.player.body.velocity.y = 0; 
-      this.scene.start("LevelScene2", phaserConfig);
+      this.scene.start("LevelScene2", gameData);
 
     }
   }
@@ -302,8 +275,8 @@ export default class LevelScene1 extends Phaser.Scene {
   }
 
   update() {
-      if (this.cactusPlatformGroup.x > game.config.width || this.cactusPlatformGroup.x < 0) {
-        this.cactusPlatformGroup.x = game.config.width/2;
+      if (this.cactusPlatformGroup.x > gameWidth || this.cactusPlatformGroup.x < 0) {
+        this.cactusPlatformGroup.x = gameWidth/2;
       }
       if(this.cursors.left.isDown) {
         this.player.body.velocity.x = -gameOptions.playerSpeed;
@@ -343,7 +316,7 @@ export default class LevelScene1 extends Phaser.Scene {
     // Based on this website: https://phasergames.com/phaser-3-physics-beginners/
     this.fireBalls.children.each(function(b) {
       if (b.active) {
-        if (b.x < 0 || b.x > game.config.width) {
+        if (b.x < 0 || b.x > gameWidth) {
             b.setActive(false);
         }
       }
@@ -357,19 +330,18 @@ export default class LevelScene1 extends Phaser.Scene {
     if (this.cursors.space.isDown) {
       this.player.body.velocity.y = -gameOptions.playerGravity/1.6; 
     }
-    if (this.player.y > game.config.height ) {
-      this.scene.start("PlayGame");
+    if (this.player.y > gameHeight ) {
+      this.scene.start("LevelScene1");
       this.score=0;
     }
-
-    if (this.player.x > game.config.width || this.player.x < 0) {
+    //this.physics.add.overlap(this.player, this.finish, this.finishLevel, null, this)
+    if (this.player.x > gameWidth || this.player.x < 0) {
       this.player.x = this.startplatform.x; 
       this.player.y = this.startplatform.y;
     }
 
-    if (this.score >= 100) {
-      this.info.setText = "YOU GOT OVER 100 POINTS!";
-      setTimeout(() => {this.scene.start("LevelScene2", phaserConfig),this.score=0}, 10);
+    if (this.score >= 50 && this.player.body.touching.down) {
+      this.scene.start("LevelScene2", this.data);
     }
 
   }

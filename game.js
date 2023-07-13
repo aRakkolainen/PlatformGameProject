@@ -1,33 +1,40 @@
 //Source for this was course material and Leevi Lautanen
+// Including the form for asking player to insert username: https://www.thepolyglotdeveloper.com/2020/09/accept-text-input-user-phaser-game/
 
 import StartScene from "./src/startScene";
 import LevelScene1 from "./src/levelScene1";
 import LevelScene2 from "./src/levelScene2";
 import LevelScene3 from "./src/levelScene3";
 import FinishScene from "./src/finishScene";
+import "./src/styles.css";
 import Phaser from "phaser";
-let game; 
+let game;
+let phaserConfig;  
 window.onload = () => {
-    let phaserConfig = {
+    phaserConfig = {
         type: Phaser.AUTO,
+        scale: {
+            mode: Phaser.Scale.Fit,
+            autoCenter: Phaser.Scale.CENTER_BOTH,
+            width: 800,
+            height: 1000
+          },
+        dom: {
+            createContainer: true
+        },
         parent: "gameContainer",
         transparent: true, 
-        mode: Phaser.Scale.Fit, 
-        autoCenter: Phaser.Scale.CENTER_BOTH,
-        width: 1280,
-        height: 720,
-        backgroundColor: "#5DACD8",
         pixelArt: true,
         physics: {
         default: "arcade",
         debug: false,
         arcade: {
-        gravity: {
-            y: 0
-        }
+            gravity: {
+                y: 0
+            }
+            },
         },
-        scene: [ BootScene, StartScene, LevelScene1, LevelScene2, LevelScene3, FinishScene ]
-    }
+    scene: [ BootScene, StartScene, LevelScene1, LevelScene2, LevelScene3, FinishScene ]
 
     }
     game = new Phaser.Game(phaserConfig);
@@ -47,7 +54,7 @@ class BootScene extends Phaser.Scene {
 
     create() {
         this.data = {
-            config: game.phaserConfig,
+            config: phaserConfig,
             options: gameOptions
         }
         this.scene.start("StartScene", this.data);

@@ -7,8 +7,7 @@
         "build": "parcel build game.html"
     },
     "dependencies": {
-        "parcel": "^2.9.3",
-        "phaser": "^3.60.0"
+        "parcel": "^2.9.3"
     },
     "devDependencies": {
         "@babel/core": "7.2.0",
