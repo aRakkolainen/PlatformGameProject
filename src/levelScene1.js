@@ -4,6 +4,7 @@
 // Background color during runtime: https://stackoverflow.com/questions/59332460/how-to-set-background-color-of-phaser-3-game-during-runtime
 // Shooting fire balls as bullets: https://phasergames.com/phaser-3-physics-beginners/
 // Switching between scenes: https://www.thepolyglotdeveloper.com/2020/09/switch-between-scenes-phaser-game/
+// Multiple scenes in Phaser: https://flaviocopes.com/phaser-multiple-scenes/
 // + Phaser 3 Documentation: https://photonstorm.github.io/phaser3-docs/index.html
 // + Course material
 //import cactusPlatform from "./assets/cactusWithPlatform.png";

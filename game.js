@@ -27,6 +27,7 @@ export const phaserConfig = {
 }
 }
 const game = new Phaser.Game(phaserConfig);
+this.scene.start(StartScene, phaserConfig);
 /*const gameConfig = {
 type: Phaser.AUTO,
 scale: {
