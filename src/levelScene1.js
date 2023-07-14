@@ -22,6 +22,7 @@ export default class LevelScene1 extends Phaser.Scene {
   constructor() {
     super("LevelScene1");
     this.score=0;
+    this.total = []; 
   }
   preload() {
     //this.load.background("background", "assets/background.png");
@@ -39,6 +40,7 @@ export default class LevelScene1 extends Phaser.Scene {
     this.load.image("spaceBar", "./assets/spaceBar.png");
     this.load.image("shoot", "./assets/shoot.png");
     this.load.image("shootStill", "./assets/shootStill.png");
+    this.load.image("test", "./assets/test.png")
     this.load.spritesheet("player", "./assets/player.png", {
       frameWidth: 32,
       frameHeight: 48,
@@ -341,6 +343,12 @@ export default class LevelScene1 extends Phaser.Scene {
     }
 
     if (this.score >= 50 && this.player.body.touching.down) {
+      this.levelScore = {
+        levelName: "Level1", 
+        score: this.score
+      }
+      this.totalPoints = [];
+      Phaser.Utils.Array.Add(this.totalPoints, this.levelScore); 
       this.scene.start("LevelScene2", this.data);
     }
 
