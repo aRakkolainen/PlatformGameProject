@@ -23,7 +23,12 @@ export default class LevelScene2 extends Phaser.Scene {
       this.load.image("spaceBar", "./assets/spaceBar.png");
       this.load.image("shoot", "./assets/shoot.png");
       this.load.image("shootStill", "./assets/shootStill.png");
-      //this.load.image("topaz", topaz);
+      this.load.image("topaz", "./assets/topaz.png");
+      this.load.image("emerald", "./assets/emerald.png");
+      this.load.image("bluestone", "./assets/bluestone.png");
+      this.load.image("coal", "./assets/coal.png");
+      this.load.image("diamond", "./assets/diamond.png");
+      this.load.image("stonemonster", "./assets/stonemonster.png");
       this.load.spritesheet("player", "./assets/player.png", {
         frameWidth: 32,
         frameHeight: 48,
@@ -44,8 +49,16 @@ export default class LevelScene2 extends Phaser.Scene {
       let div = document.getElementById("gameContainer");
       div.style.background = div.style.background = "linear-gradient(#113388, #114488, #247899)";
       //Things to collect info
-
-
+      const coal = this.physics.add.image(30, 60, "coal");
+      this.add.text(45, 50, "1 point ", {fontSize:"20px", fill: "#ffffff", fontStyle:"bold"})
+      this.add.text(45, 90, "3 points", {fontSize:"20px", fill: "#ffffff", fontStyle:"bold"})
+      const emerald = this.physics.add.image(30, 100, "emerald")
+      this.add.text(45, 140, "5 points", {fontSize:"20px", fill: "#ffffff", fontStyle:"bold"})
+      const topaz = this.physics.add.image(30, 140, "topaz")
+      this.blueText = this.add.text(45, 190, "10 points", {fontSize:"20px", fill: "#ffffff", fontStyle:"bold"})
+      const blueStone = this.physics.add.image(30, 200, "bluestone");
+      this.add.text(45, 240, "15 points", {fontSize:"20px", fill: "#ffffff", fontStyle:"bold"})
+      const diamond = this.physics.add.image(30, 240, "diamond");
       //How to play instructions: 
       this.keys = this.add.text(150, 5, "KEYS: ", {fontSize:"25px", fill: "#ffffff", fontStyle:"bold"})
       this.add.image(180, 55, "arrows");
@@ -82,6 +95,38 @@ export default class LevelScene2 extends Phaser.Scene {
       {defaultKey: 'fireball', 
     maxSize: 10, }
     );
+    //Monsters
+    this.stonemonsterGroup = this.physics.add.group({
+      immovable: false, 
+      allowGravity: false
+    })
+    // Collectibles: 
+
+    this.topazGroup = this.physics.add.group({})
+    this.emeraldGroup = this.physics.add.group({})
+    this.coalGroup = this.physics.add.group({})
+    this.bluestoneGroup = this.physics.add.group({})
+    this.diamondGroup = this.physics.add.group({});
+    for (let i=0; i < 20; i++) {
+      this.coalGroup.create(Phaser.Math.Between(30, gameWidth), Phaser.Math.Between(210, gameHeight), "coal")
+    }
+
+    for (let i=0; i < 15; i++) {
+      this.emeraldGroup.create(Phaser.Math.Between(30, gameWidth), Phaser.Math.Between(210, gameHeight), "emerald")
+    }
+
+    for (let i=0; i < 10; i++) {
+      this.topazGroup.create(Phaser.Math.Between(30, gameWidth), Phaser.Math.Between(210, gameHeight), "topaz")
+    }
+
+    for (let i=0; i < 5; i++) {
+      this.bluestoneGroup.create(Phaser.Math.Between(30, gameWidth), Phaser.Math.Between(210, gameHeight), "bluestone")
+    }
+
+    for (let i=0; i < 3; i++) {
+      this.diamondGroup.create(Phaser.Math.Between(30, gameWidth), Phaser.Math.Between(210, gameHeight), "diamond")
+    }
+
 
     this.startplatform = this.physics.add.staticSprite(gameWidth/5.5, gameHeight/(1/0.87), "mountainplatform");
     this.endPlatform = this.physics.add.staticSprite(gameWidth-100, gameHeight-850, "mountainplatform");
@@ -91,6 +136,7 @@ export default class LevelScene2 extends Phaser.Scene {
     let skeletonPlatformNum = Phaser.Math.Between(3, 15);
     for(let i = 0; i < platformNum; i++) {
       this.platformGroup.create(Phaser.Math.Between(30, gameWidth), Phaser.Math.Between(210, gameHeight), "mountainplatform");
+      this.stonemonsterGroup.create(Phaser.Math.Between(30, gameWidth), Phaser.Math.Between(210, gameHeight), "stonemonster")
     }
 
     for(let i = 0; i < smallPlatformNum; i++) {
@@ -102,53 +148,11 @@ export default class LevelScene2 extends Phaser.Scene {
     }
 
     this.player = this.physics.add.sprite(gameWidth/5.5, gameHeight/(1/0.80), "player")
-    //this.physics.add.image(gameWidth/6, gameHeight/(1/0.80, "topaz"));
-
     this.player.body.gravity.y = gameOptions.playerGravity;
-    this.physics.add.collider(this.player, this.startplatform);
     this.physics.add.collider(this.player, this.platformGroup);
     this.physics.add.collider(this.player, this.smallPlatformGroup);
     this.physics.add.collider(this.player, this.skeletonPlatformGroup);
-    this.physics.add.collider(this.player, this.endPlatform, this.finishLevel, null,  null);
-
-
-
-  
-
-
-
-
-
-      this.cursors = this.input.keyboard.createCursorKeys();
-
-      this.anims.create({
-        key: "left", 
-        frames: this.anims.generateFrameNumbers("player", {start: 0, end: 3}), 
-        frameRate: 10,
-        repeat: -1
-      })
-
-      this.anims.create({
-        key: "turn", 
-        frames: [{key: "player", frame: 4}],
-        frameRate: 10, 
-    })
-
-    this.anims.create({
-        key: "right", 
-        frames: this.anims.generateFrameNumbers("player", {start: 5, end: 9}), 
-        frameRate: 10, 
-    })
-    this.anims.create({
-      key: "shootLeft", 
-      frames: this.anims.generateFrameNumbers("player", {start: 3, end: 0}),
-      frameRate: 10,
-    })
-    this.anims.create({
-      key: "shootRight", 
-      frames: this.anims.generateFrameNumbers("player", {start: 8, end:5}), 
-      frameRate: 10,
-    })
+    this.cursors = this.input.keyboard.createCursorKeys();
     }
 
     //Based on this: https://phasergames.com/phaser-3-physics-beginners/ 
