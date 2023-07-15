@@ -576,6 +576,7 @@ function hmrAccept(bundle /*: ParcelRequire */ , id /*: string */ ) {
 },{}],"5JiMD":[function(require,module,exports) {
 //Source for this was course material and Leevi Lautanen
 // Including the form for asking player to insert username: https://www.thepolyglotdeveloper.com/2020/09/accept-text-input-user-phaser-game/
+// How to get user input with Phaser 3 plugin called rexUI: https://blog.ourcade.co/posts/2020/phaser-3-add-text-input-rexui/
 var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
 var _startScene = require("./src/startScene");
 var _startSceneDefault = parcelHelpers.interopDefault(_startScene);
@@ -587,6 +588,8 @@ var _levelScene3 = require("./src/levelScene3");
 var _levelScene3Default = parcelHelpers.interopDefault(_levelScene3);
 var _finishScene = require("./src/finishScene");
 var _finishSceneDefault = parcelHelpers.interopDefault(_finishScene);
+var _uiPlugin = require("phaser3-rex-plugins/templates/ui/ui-plugin");
+var _uiPluginDefault = parcelHelpers.interopDefault(_uiPlugin);
 var _stylesCss = require("./src/styles.css");
 var _phaser = require("phaser");
 var _phaserDefault = parcelHelpers.interopDefault(_phaser);
@@ -616,6 +619,15 @@ window.onload = ()=>{
                 }
             }
         },
+        plugins: {
+            scene: [
+                {
+                    key: "rexUI",
+                    plugin: (0, _uiPluginDefault.default),
+                    mapping: "rexUI"
+                }
+            ]
+        },
         scene: [
             BootScene,
             (0, _startSceneDefault.default),
@@ -639,13 +651,27 @@ class BootScene extends (0, _phaserDefault.default).Scene {
     create() {
         this.data = {
             config: phaserConfig,
-            options: gameOptions
+            options: gameOptions,
+            totalScore: [
+                {
+                    name: "level1",
+                    score: 0
+                },
+                {
+                    name: "level2",
+                    score: 0
+                },
+                {
+                    name: "level3",
+                    score: 0
+                }
+            ]
         };
         this.scene.start("StartScene", this.data);
     }
 }
 
-},{"./src/startScene":"loePq","./src/levelScene1":"4cF2E","./src/levelScene2":"fNmku","./src/levelScene3":"ccm34","./src/finishScene":"5rk9W","./src/styles.css":"lW6qc","phaser":"d1pJ3","@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3"}],"ccm34":[function(require,module,exports) {
+},{"./src/startScene":"loePq","./src/levelScene1":"4cF2E","./src/levelScene2":"fNmku","./src/levelScene3":"ccm34","./src/finishScene":"5rk9W","./src/styles.css":"lW6qc","phaser":"d1pJ3","@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3","phaser3-rex-plugins/templates/ui/ui-plugin":"kCKu7"}],"ccm34":[function(require,module,exports) {
 var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
 parcelHelpers.defineInteropFlag(exports);
 var _phaser = require("phaser");
@@ -764,51 +790,35 @@ class LevelScene3 extends (0, _phaserDefault.default).Scene {
         this.physics.add.collider(this.player, this.smallPlatformGroup);
         //this.physics.add.collider(this.player, this.skeletonPlatformGroup);
         this.cursors = this.input.keyboard.createCursorKeys();
-        this.anims.create({
-            key: "left",
-            frames: this.anims.generateFrameNumbers("player", {
-                start: 0,
-                end: 3
-            }),
-            frameRate: 10,
-            repeat: -1
-        });
-        this.anims.create({
-            key: "turn",
-            frames: [
-                {
-                    key: "player",
-                    frame: 4
-                }
-            ],
-            frameRate: 10
-        });
-        this.anims.create({
-            key: "right",
-            frames: this.anims.generateFrameNumbers("player", {
-                start: 5,
-                end: 9
-            }),
-            frameRate: 10
-        });
-        this.anims.create({
-            key: "shootLeft",
-            //frames: [{key: "player", frame: 0}],
-            frames: this.anims.generateFrameNumbers("player", {
-                start: 3,
-                end: 0
-            }),
-            frameRate: 10
-        });
-        this.anims.create({
-            key: "shootRight",
-            frames: this.anims.generateFrameNumbers("player", {
-                start: 8,
-                end: 5
-            }),
-            frameRate: 10
-        });
-    }
+    /*this.anims.create({
+        key: "left", 
+        frames: this.anims.generateFrameNumbers("player", {start: 0, end: 3}), 
+        frameRate: 10,
+        repeat: -1
+    })
+
+    this.anims.create({
+        key: "turn", 
+        frames: [{key: "player", frame: 4}],
+        frameRate: 10, 
+    })
+
+    this.anims.create({
+        key: "right", 
+        frames: this.anims.generateFrameNumbers("player", {start: 5, end: 9}), 
+        frameRate: 10, 
+    })
+    this.anims.create({
+      key: "shootLeft", 
+      //frames: [{key: "player", frame: 0}],
+      frames: this.anims.generateFrameNumbers("player", {start: 3, end: 0}),
+      frameRate: 10,
+    })
+    this.anims.create({
+      key: "shootRight", 
+      frames: this.anims.generateFrameNumbers("player", {start: 8, end:5}), 
+      frameRate: 10,
+    })*/ }
     //Based on this: https://phasergames.com/phaser-3-physics-beginners/ 
     shootLeft(player) {
         let fireBall = this.fireBalls.get(this.player.x, this.player.y);
@@ -824,6 +834,16 @@ class LevelScene3 extends (0, _phaserDefault.default).Scene {
             fireBall.setActive(true);
             fireBall.setVisible(true);
             fireBall.body.velocity.x = 200;
+        }
+    }
+    finishLevel(player, start, gameData) {
+        if (this.score < 150) this.info.setText("Collect more points");
+        else if (this.score >= 1) {
+            this.info.setText("You won!");
+            this.player.body.velocity.x = 0;
+            this.player.body.velocity.y = 0;
+            gameScore[1].score = this.score;
+            this.scene.start("LevelScene3", this.data);
         }
     }
     update() {
@@ -846,14 +866,14 @@ class LevelScene3 extends (0, _phaserDefault.default).Scene {
             this.shootRight();
             this.player.anims.play("shootRight", true);
         }
-        // When shift is pressed while shooting, player stays at one position
-        if (this.cursors.left.isDown && this.cursors.shift.isDown) {
+        // When shift is pressed while shooting and player is on platform, player stays at one position
+        if (this.cursors.left.isDown && this.cursors.shift.isDown && this.player.body.touching.down) {
             this.player.body.velocity.y = 0;
             this.player.body.velocity.x = 0;
             this.shootLeft();
             this.player.anims.play("shootLeft", true);
         }
-        if (this.cursors.right.isDown && this.cursors.shift.isDown) {
+        if (this.cursors.right.isDown && this.cursors.shift.isDown && this.player.body.touching.down) {
             this.player.body.velocity.y = 0;
             this.player.body.velocity.x = 0;
             this.shootRight();
@@ -868,7 +888,7 @@ class LevelScene3 extends (0, _phaserDefault.default).Scene {
         if (this.cursors.up.isDown && this.player.body.touching.down) this.player.body.velocity.y = -gameOptions.playerGravity / 1.6;
         if (this.cursors.space.isDown) this.player.body.velocity.y = -gameOptions.playerGravity / 1.6;
         if (this.player.y > gameHeight) {
-            this.scene.start("LevelScene2");
+            this.scene.start("LevelScene3");
             this.score = 0;
         }
         //this.physics.add.overlap(this.player, this.finish, this.finishLevel, null, this)
@@ -876,7 +896,6 @@ class LevelScene3 extends (0, _phaserDefault.default).Scene {
             this.player.x = this.startplatform.x;
             this.player.y = this.startplatform.y;
         }
-        if (this.score >= 150 && this.player.body.touching.down) this.scene.start("FinishScene", this.data);
     }
 }
 exports.default = LevelScene3;

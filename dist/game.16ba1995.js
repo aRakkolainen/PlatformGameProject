@@ -578,13 +578,13 @@ var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
 parcelHelpers.defineInteropFlag(exports);
 var _phaser = require("phaser");
 var _phaserDefault = parcelHelpers.interopDefault(_phaser);
-//import topaz from "./assets/topaz.png"
 let totalPoints;
 let data;
 let gameConfig;
 let gameOptions;
 let gameWidth;
 let gameHeight;
+let gameScore;
 class LevelScene2 extends (0, _phaserDefault.default).Scene {
     constructor(){
         super("LevelScene2");
@@ -598,7 +598,6 @@ class LevelScene2 extends (0, _phaserDefault.default).Scene {
         this.load.image("fireball", "./assets/fireball.png");
         this.load.image("arrows", "./assets/arrows.png");
         this.load.image("spaceBar", "./assets/spaceBar.png");
-        this.load.image("shoot", "./assets/shoot.png");
         this.load.image("shootStill", "./assets/shootStill.png");
         this.load.image("topaz", "./assets/topaz.png");
         this.load.image("emerald", "./assets/emerald.png");
@@ -606,19 +605,20 @@ class LevelScene2 extends (0, _phaserDefault.default).Scene {
         this.load.image("coal", "./assets/coal.png");
         this.load.image("diamond", "./assets/diamond.png");
         this.load.image("stonemonster", "./assets/stonemonster.png");
+        this.load.image("finish_line", "./assets/finish.png");
         this.load.spritesheet("player", "./assets/player.png", {
             frameWidth: 32,
             frameHeight: 48
         });
     }
-    create(gameData, totalPoints) {
-        this.totalPoints = totalPoints;
-        console.log(this.totalPoints);
+    create(gameData) {
         this.data = gameData;
+        console.log(gameData.totalScore);
         gameConfig = gameData.config;
         gameWidth = gameConfig.scale.width;
         gameHeight = gameConfig.scale.height;
         gameOptions = gameData.options;
+        gameScore = gameData.totalScore;
         //This is based on this website: https://stackoverflow.com/questions/59332460/how-to-set-background-color-of-phaser-3-game-during-runtime
         let div = document.getElementById("gameContainer");
         div.style.background = div.style.background = "linear-gradient(#113388, #114488, #247899)";
@@ -711,7 +711,7 @@ class LevelScene2 extends (0, _phaserDefault.default).Scene {
         //Fire balls: 
         this.fireBalls = this.physics.add.group({
             defaultKey: "fireball",
-            maxSize: 10
+            maxSize: 50
         });
         //Monsters
         this.stonemonsterGroup = this.physics.add.group({
@@ -729,8 +729,9 @@ class LevelScene2 extends (0, _phaserDefault.default).Scene {
         for(let i = 0; i < 10; i++)this.topazGroup.create((0, _phaserDefault.default).Math.Between(30, gameWidth), (0, _phaserDefault.default).Math.Between(210, gameHeight), "topaz");
         for(let i = 0; i < 5; i++)this.bluestoneGroup.create((0, _phaserDefault.default).Math.Between(30, gameWidth), (0, _phaserDefault.default).Math.Between(210, gameHeight), "bluestone");
         for(let i = 0; i < 3; i++)this.diamondGroup.create((0, _phaserDefault.default).Math.Between(30, gameWidth), (0, _phaserDefault.default).Math.Between(210, gameHeight), "diamond");
-        this.startplatform = this.physics.add.staticSprite(gameWidth / 5.5, gameHeight / (1 / 0.87), "mountainplatform");
+        this.startPlatform = this.physics.add.staticSprite(gameWidth / 5.5, gameHeight / (1 / 0.88), "mountainplatform");
         this.endPlatform = this.physics.add.staticSprite(gameWidth - 100, gameHeight - 850, "mountainplatform");
+        this.finish = this.add.image(gameWidth - 140, gameHeight - 870, "finish_line");
         let platformNum = (0, _phaserDefault.default).Math.Between(3, 10);
         let smallPlatformNum = (0, _phaserDefault.default).Math.Between(2, 15);
         let skeletonPlatformNum = (0, _phaserDefault.default).Math.Between(3, 15);
@@ -744,8 +745,46 @@ class LevelScene2 extends (0, _phaserDefault.default).Scene {
         this.player.body.gravity.y = gameOptions.playerGravity;
         this.physics.add.collider(this.player, this.platformGroup);
         this.physics.add.collider(this.player, this.smallPlatformGroup);
-        this.physics.add.collider(this.player, this.skeletonPlatformGroup);
+        this.physics.add.collider(this.player, this.skeletonPlatformGroup, this.movePlatform, null, this);
+        this.physics.add.collider(this.player, this.startPlatform);
+        this.physics.add.overlap(this.player, this.stonemonsterGroup, this.enemyAttack, null, this);
+        this.physics.add.collider(this.player, this.endPlatform, this.finishLevel, null, this);
+        this.physics.add.overlap(this.player, this.coalGroup, this.collectCoal, null, this);
+        this.physics.add.overlap(this.player, this.emeraldGroup, this.collectEmerald, null, this);
+        this.physics.add.overlap(this.player, this.topazGroup, this.collectTopaz, null, this);
+        this.physics.add.overlap(this.player, this.bluestoneGroup, this.collectBlueStone, null, this);
+        this.physics.add.overlap(this.player, this.diamondGroup, this.collectDiamond, null, this);
+        this.physics.add.overlap(this.player, this.stonemonsterGroup, this.moveStone, null, this);
+        this.physics.add.collider(this.fireBalls, this.platformGroup, this.disappear, null, this);
+        this.physics.add.collider(this.fireBalls, this.smallPlatformGroup, this.disappear, null, this);
+        this.physics.add.collider(this.fireBalls, this.skeletonPlatformGroup, this.disappear, null, this);
+        this.physics.add.overlap(this.fireBalls, this.stonemonsterGroup, this.enemyKill, null, this);
         this.cursors = this.input.keyboard.createCursorKeys();
+    }
+    collectCoal(player, start) {
+        start.disableBody(true, true);
+        this.score += 1;
+        this.scoreText.setText(this.score);
+    }
+    collectEmerald(player, start) {
+        start.disableBody(true, true);
+        this.score += 3;
+        this.scoreText.setText(this.score);
+    }
+    collectTopaz(player, start) {
+        start.disableBody(true, true);
+        this.score += 5;
+        this.scoreText.setText(this.score);
+    }
+    collectBlueStone(player, start) {
+        start.disableBody(true, true);
+        this.score += 10;
+        this.scoreText.setText(this.score);
+    }
+    collectDiamond(player, start) {
+        start.disableBody(true, true);
+        this.score += 15;
+        this.scoreText.setText(this.score);
     }
     //Based on this: https://phasergames.com/phaser-3-physics-beginners/ 
     shootLeft(player) {
@@ -764,17 +803,37 @@ class LevelScene2 extends (0, _phaserDefault.default).Scene {
             fireBall.body.velocity.x = 200;
         }
     }
+    enemyKill(player, start) {
+        start.disableBody(true, true);
+        this.score += 3;
+        this.scoreText.setText(this.score);
+    }
+    movePlatform(player, start) {
+        start.body.velocity.y = (0, _phaserDefault.default).Math.Between(50, 150);
+    }
+    enemyAttack(player, start) {
+        if (this.score > 10) {
+            this.score -= 10;
+            this.scoreText.setText(this.score);
+        }
+        start.body.velocity.y = (0, _phaserDefault.default).Math.Between(-100, 100);
+        this.enemyMoving = true;
+        this.player.x = this.startPlatform.x;
+        this.player.y = this.startPlatform.y;
+    }
+    disappear(start) {
+        start.disableBody(false, true);
+    }
     finishLevel(player, start, gameData) {
-        console.log(gameData);
-    /*if (this.score < 50) {
-        this.info.setText("Collect more points")
-      } else if (this.score >= 50){
-        this.info.setText("You won!")
-        this.player.body.velocity.x = 0; 
-        this.player.body.velocity.y = 0; 
-        this.scene.start("LevelScene3", gameData);
-  
-      }*/ }
+        if (this.score < 100) this.info.setText("Collect more points");
+        else if (this.score >= 100) {
+            this.info.setText("You won!");
+            this.player.body.velocity.x = 0;
+            this.player.body.velocity.y = 0;
+            gameScore[1].score = this.score;
+            this.scene.start("LevelScene3", this.data);
+        }
+    }
     update() {
         if (this.cursors.left.isDown) {
             this.player.body.velocity.x = -gameOptions.playerSpeed;
@@ -787,22 +846,22 @@ class LevelScene2 extends (0, _phaserDefault.default).Scene {
             this.player.anims.play("turn", true);
         }
         //Shooting options (First two are shooting while player is moving)
-        if (this.cursors.left.isDown) {
+        if (this.cursors.left.isDown && this.cursors.shift.isDown) {
             this.shootLeft();
             this.player.anims.play("shootLeft", true);
         }
-        if (this.cursors.right.isDown) {
+        if (this.cursors.right.isDown && this.cursors.shift.isDown) {
             this.shootRight();
             this.player.anims.play("shootRight", true);
         }
-        // When shift is pressed while shooting, player stays at one position
-        if (this.cursors.left.isDown && this.cursors.shift.isDown) {
+        // When shift is pressed while shooting and player is on platform, player stays at one position
+        if (this.cursors.left.isDown && this.cursors.shift.isDown && this.player.body.touching.down) {
             this.player.body.velocity.y = 0;
             this.player.body.velocity.x = 0;
             this.shootLeft();
             this.player.anims.play("shootLeft", true);
         }
-        if (this.cursors.right.isDown && this.cursors.shift.isDown) {
+        if (this.cursors.right.isDown && this.cursors.shift.isDown && this.player.body.touching.down) {
             this.player.body.velocity.y = 0;
             this.player.body.velocity.x = 0;
             this.shootRight();
@@ -811,6 +870,7 @@ class LevelScene2 extends (0, _phaserDefault.default).Scene {
         // Based on this website: https://phasergames.com/phaser-3-physics-beginners/
         this.fireBalls.children.each((function(b) {
             if (b.active) {
+                b.setActive(true);
                 if (b.x < 0 || b.x > gameWidth) b.setActive(false);
             }
         }).bind(this));
@@ -822,10 +882,9 @@ class LevelScene2 extends (0, _phaserDefault.default).Scene {
         }
         //this.physics.add.overlap(this.player, this.finish, this.finishLevel, null, this)
         if (this.player.x > gameWidth || this.player.x < 0) {
-            this.player.x = this.startplatform.x;
-            this.player.y = this.startplatform.y;
+            this.player.x = this.startPlatform.x;
+            this.player.y = this.startPlatform.y;
         }
-        if (this.score >= 100 && this.player.body.touching.down) this.scene.start("LevelScene3", this.data);
     }
 }
 exports.default = LevelScene2;

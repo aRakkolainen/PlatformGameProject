@@ -101,7 +101,7 @@ export default class LevelScene3 extends Phaser.Scene {
     //this.physics.add.collider(this.player, this.skeletonPlatformGroup);
     this.cursors = this.input.keyboard.createCursorKeys();
 
-      this.anims.create({
+      /*this.anims.create({
         key: "left", 
         frames: this.anims.generateFrameNumbers("player", {start: 0, end: 3}), 
         frameRate: 10,
@@ -129,9 +129,9 @@ export default class LevelScene3 extends Phaser.Scene {
       key: "shootRight", 
       frames: this.anims.generateFrameNumbers("player", {start: 8, end:5}), 
       frameRate: 10,
-    })
+    })*/
 
-    }
+  }
     //Based on this: https://phasergames.com/phaser-3-physics-beginners/ 
     shootLeft(player) {
       let fireBall = this.fireBalls.get(this.player.x, this.player.y);
@@ -149,6 +149,19 @@ export default class LevelScene3 extends Phaser.Scene {
         fireBall.body.velocity.x = 200;
       }
     }
+
+      finishLevel(player, start, gameData) {
+        if (this.score < 150) {
+          this.info.setText("Collect more points")
+        } else if (this.score >= 1){
+          this.info.setText("You won!")
+          this.player.body.velocity.x = 0; 
+          this.player.body.velocity.y = 0; 
+          gameScore[1].score = this.score;
+          this.scene.start("LevelScene3", this.data);
+    
+        }
+      }
     
 
     update() {
@@ -174,19 +187,19 @@ export default class LevelScene3 extends Phaser.Scene {
       this.shootRight();
       this.player.anims.play("shootRight", true)
     }
-  // When shift is pressed while shooting, player stays at one position
-    if (this.cursors.left.isDown && this.cursors.shift.isDown) {
-      this.player.body.velocity.y=0;
-      this.player.body.velocity.x=0;
-      this.shootLeft();
-      this.player.anims.play("shootLeft", true)
-    }
+  // When shift is pressed while shooting and player is on platform, player stays at one position
+  if (this.cursors.left.isDown && this.cursors.shift.isDown && this.player.body.touching.down) {
+    this.player.body.velocity.y=0;
+    this.player.body.velocity.x=0;
+    this.shootLeft();
+    this.player.anims.play("shootLeft", true)
+  }
 
-    if (this.cursors.right.isDown && this.cursors.shift.isDown) {
-      this.player.body.velocity.y=0;
-      this.player.body.velocity.x=0;
-      this.shootRight();
-      this.player.anims.play("shootRight", true)
+  if (this.cursors.right.isDown && this.cursors.shift.isDown && this.player.body.touching.down) {
+    this.player.body.velocity.y=0;
+    this.player.body.velocity.x=0;
+    this.shootRight();
+    this.player.anims.play("shootRight", true)
   }
     // Based on this website: https://phasergames.com/phaser-3-physics-beginners/
     this.fireBalls.children.each(function(b) {
@@ -206,7 +219,7 @@ export default class LevelScene3 extends Phaser.Scene {
       this.player.body.velocity.y = -gameOptions.playerGravity/1.6; 
     }
     if (this.player.y > gameHeight ) {
-      this.scene.start("LevelScene2");
+      this.scene.start("LevelScene3");
       this.score=0;
     }
   //this.physics.add.overlap(this.player, this.finish, this.finishLevel, null, this)
@@ -215,9 +228,5 @@ export default class LevelScene3 extends Phaser.Scene {
     this.player.y = this.startplatform.y;
   }
 
-  if (this.score >= 150 && this.player.body.touching.down) {
-    this.scene.start("FinishScene", this.data);
   }
-        
-    }
 }

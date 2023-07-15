@@ -595,11 +595,12 @@ let gameConfig;
 let gameOptions;
 let gameWidth;
 let gameHeight;
+let gameScore;
 class LevelScene1 extends (0, _phaserDefault.default).Scene {
     constructor(){
         super("LevelScene1");
         this.score = 0;
-        this.total = [];
+        this.enemyMoving = false;
     }
     preload() {
         //this.load.background("background", "assets/background.png");
@@ -627,6 +628,7 @@ class LevelScene1 extends (0, _phaserDefault.default).Scene {
         let div = document.getElementById("gameContainer");
         div.style.background = "linear-gradient(#113388, #114488, #553388, #594488, #773388, #993388,#652244, #673346)";
         this.data = gameData;
+        gameScore = gameData.totalScore;
         gameConfig = gameData.config;
         gameWidth = gameConfig.scale.width;
         gameHeight = gameConfig.scale.height;
@@ -653,11 +655,11 @@ class LevelScene1 extends (0, _phaserDefault.default).Scene {
         //Fire balls: 
         this.fireBalls = this.physics.add.group({
             defaultKey: "fireball",
-            maxSize: 10
+            maxSize: 50
         });
         this.startplatform = this.physics.add.staticSprite(gameWidth / 2, gameHeight / (1 / 0.87), "platform");
         this.endPlatform = this.physics.add.staticSprite(gameWidth - 100, gameHeight - 850, "platform");
-        this.finish = this.physics.add.staticSprite(gameWidth - 75, gameHeight - 910, "finish_line");
+        this.finish = this.physics.add.staticSprite(gameWidth - 75, gameHeight - 885, "finish_line");
         let platformNum = (0, _phaserDefault.default).Math.Between(3, 15);
         let smallPlatformNum = (0, _phaserDefault.default).Math.Between(3, 20);
         for(let i = 0; i < platformNum; i++)this.platformGroup.create((0, _phaserDefault.default).Math.Between(30, gameWidth), (0, _phaserDefault.default).Math.Between(210, gameHeight), "platform");
@@ -672,10 +674,11 @@ class LevelScene1 extends (0, _phaserDefault.default).Scene {
         this.player.body.gravity.y = gameOptions.playerGravity;
         this.physics.add.collider(this.player, this.platformGroup);
         this.physics.add.collider(this.player, this.smallPlatformGroup);
-        this.physics.add.collider(this.cactusGroup, this.platformGroup);
-        this.physics.add.collider(this.cactusGroup, this.smallPlatformGroup);
+        this.physics.add.collider(this.cactusGroup, this.platformGroup, this.moveCactus, null, this);
+        this.physics.add.collider(this.cactusGroup, this.smallPlatformGroup, this.stopCactus, null, this);
         this.physics.add.collider(this.player, this.startplatform);
-        //this.physics.add.collider(this.player, this.cactusPlatformGroup);
+        this.physics.add.collider(this.player, this.cactusPlatformGroup, this.movePlatform, null, this);
+        this.physics.add.collider(this.player, this.finish, this.finishLevel, null, this);
         this.physics.add.collider(this.player, this.endPlatform);
         this.yellowPopsicleGroup = this.physics.add.group({});
         this.pinkPopsicleGroup = this.physics.add.group({});
@@ -744,28 +747,27 @@ class LevelScene1 extends (0, _phaserDefault.default).Scene {
             fontSize: "18px",
             fill: "#ffffff"
         });
-        this.shoot = this.add.image(170, 130, "shoot");
-        this.add.text(220, 120, "Shoot", {
+        this.add.text(225, 145, "Shoot", {
             fontSize: "18px",
             fill: "#ffffff"
         });
-        this.add.text(220, 160, "Shoot at still", {
-            fontSize: "18px",
-            fill: "#ffffff"
-        });
-        this.shootStill = this.add.image(183, 170, "shootStill");
+        this.shoot = this.add.image(185, 150, "shootStill");
         this.info = this.add.text(gameWidth - 420, 5, "Collect at least 50 points to win!", {
             fontSize: "20px",
             fill: "#ffffff",
             fontStyle: "bold"
         });
+        // overlaps for collecting items and interacting with enemies
         this.physics.add.overlap(this.player, this.yellowPopsicleGroup, this.collectYellowPopsicle, null, this);
         this.physics.add.overlap(this.player, this.pinkPopsicleGroup, this.collectPinkPopsicle, null, this);
         this.physics.add.overlap(this.player, this.whitePopsicleGroup, this.collectWhitePopsicle, null, this);
         this.physics.add.overlap(this.player, this.bluePopsicleGroup, this.collectBluePopsicle, null, this);
         this.physics.add.overlap(this.player, this.cactusGroup, this.cactusAttack, null, this);
         this.physics.add.overlap(this.fireBalls, this.cactusGroup, this.cactusKill, null, this);
-        this.physics.add.overlap(this.player, this.cactusPlatformGroup, this.movePlatform, null, this);
+        // Making fireBalls to stop to platforms
+        this.physics.add.collider(this.fireBalls, this.platformGroup, this.disappear, null, this);
+        this.physics.add.collider(this.fireBalls, this.smallPlatformGroup, this.disappear, null, this);
+        this.physics.add.collider(this.fireBalls, this.cactusPlatformGroup, this.disappear, null, this);
         this.cursors = this.input.keyboard.createCursorKeys();
         this.anims.create({
             key: "left",
@@ -812,6 +814,9 @@ class LevelScene1 extends (0, _phaserDefault.default).Scene {
             frameRate: 10
         });
     }
+    stopCactus(start) {
+        if (this.enemyMoving == true || start.body.x > gameWidth) start.body.velocity.x = 0;
+    }
     collectYellowPopsicle(player, start) {
         start.disableBody(true, true);
         this.score += 1;
@@ -837,6 +842,8 @@ class LevelScene1 extends (0, _phaserDefault.default).Scene {
             this.score -= 5;
             this.scoreText.setText(this.score);
         }
+        start.body.velocity.x = (0, _phaserDefault.default).Math.Between(-100, 100);
+        this.enemyMoving = true;
         this.player.x = this.startplatform.x;
         this.player.y = this.startplatform.y;
     }
@@ -845,13 +852,14 @@ class LevelScene1 extends (0, _phaserDefault.default).Scene {
         this.score += 5;
         this.scoreText.setText(this.score);
     }
-    finishLevel(player, start, gameData) {
+    finishLevel() {
         if (this.score < 50) this.info.setText("Collect more points");
         else if (this.score >= 50) {
             this.info.setText("You won!");
             this.player.body.velocity.x = 0;
             this.player.body.velocity.y = 0;
-            this.scene.start("LevelScene2", gameData);
+            gameScore[0].score = this.score;
+            this.scene.start("LevelScene2", this.data);
         }
     }
     //Based on this: https://phasergames.com/phaser-3-physics-beginners/ 
@@ -871,6 +879,9 @@ class LevelScene1 extends (0, _phaserDefault.default).Scene {
             fireBall.body.velocity.x = 200;
         }
     }
+    disappear(start) {
+        start.disableBody(false, true);
+    }
     movePlatform(player, start) {
         start.body.velocity.x = (0, _phaserDefault.default).Math.Between(-150, 150);
         start.body.velocity.y = (0, _phaserDefault.default).Math.Between(-150, 150);
@@ -888,22 +899,22 @@ class LevelScene1 extends (0, _phaserDefault.default).Scene {
             this.player.anims.play("turn", true);
         }
         //Shooting options (First two are shooting while player is moving)
-        if (this.cursors.left.isDown) {
+        if (this.cursors.left.isDown && this.cursors.shift.isDown) {
             this.shootLeft();
             this.player.anims.play("shootLeft", true);
         }
-        if (this.cursors.right.isDown) {
+        if (this.cursors.right.isDown && this.cursors.shift.isDown) {
             this.shootRight();
             this.player.anims.play("shootRight", true);
         }
         // When shift is pressed while shooting, player stays at one position
-        if (this.cursors.left.isDown && this.cursors.shift.isDown) {
+        if (this.cursors.left.isDown && this.cursors.shift.isDown && this.player.body.touching.down) {
             this.player.body.velocity.y = 0;
             this.player.body.velocity.x = 0;
             this.shootLeft();
             this.player.anims.play("shootLeft", true);
         }
-        if (this.cursors.right.isDown && this.cursors.shift.isDown) {
+        if (this.cursors.right.isDown && this.cursors.shift.isDown && this.player.body.touching.down) {
             this.player.body.velocity.y = 0;
             this.player.body.velocity.x = 0;
             this.shootRight();
@@ -912,6 +923,7 @@ class LevelScene1 extends (0, _phaserDefault.default).Scene {
         // Based on this website: https://phasergames.com/phaser-3-physics-beginners/
         this.fireBalls.children.each((function(b) {
             if (b.active) {
+                b.setActive(true);
                 if (b.x < 0 || b.x > gameWidth) b.setActive(false);
             }
         }).bind(this));
@@ -925,17 +937,12 @@ class LevelScene1 extends (0, _phaserDefault.default).Scene {
         if (this.player.x > gameWidth || this.player.x < 0) {
             this.player.x = this.startplatform.x;
             this.player.y = this.startplatform.y;
+            this.score -= 1;
         }
-        if (this.score >= 50 && this.player.body.touching.down) {
-            this.levelScore = {
-                levelName: "Level1",
-                score: this.score
-            };
-            this.totalPoints = [];
-            (0, _phaserDefault.default).Utils.Array.Add(this.totalPoints, this.levelScore);
-            this.scene.start("LevelScene2", this.data);
-        }
-    }
+    /*if (this.score >= 50) {
+      gameScore[0].score = this.score; 
+      this.scene.start("LevelScene2", this.data);
+    }*/ }
 }
 exports.default = LevelScene1;
  //import "./styles.css";
