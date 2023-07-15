@@ -4,23 +4,31 @@ let gameConfig;
 let gameOptions; 
 let gameWidth; 
 let gameHeight; 
+let gameScore; 
 import moonplatform from "./assets/moonplatform.png";
 import smallmoonplatform from "./assets/smallmoon_platform.png";
 
 export default class LevelScene3 extends Phaser.Scene { 
     constructor() {
       super("LevelScene3");
-      this.score=150;
+      this.score=0;
     }
     preload() {
       this.load.image("moonplatform", moonplatform);
       this.load.image("smallmoonPlatform", smallmoonplatform);
+      this.load.image("moonplatform2", "./assets/moonplatform2.png");
       //this.load.image("mountainsmallSkeletonPlatform", "./assets/smallSkeletonplatform.png");
       this.load.image("fireball", "./assets/fireball.png");
       this.load.image("arrows", "./assets/arrows.png");
       this.load.image("spaceBar", "./assets/spaceBar.png");
-      this.load.image("shoot", "./assets/shoot.png");
-      this.load.image("shootStill", "./assets/shootStill.png");
+      this.load.image("blackhole", "./assets/blackhole.png");
+      this.load.image("finish", "./assets/finish.png");
+      this.load.image("alien", "./assets/alien.png");
+      this.load.image("star1", "./assets/star1.png");
+      this.load.image("star2", "./assets/star2.png");
+      this.load.image("star3", "./assets/star3.png");
+      this.load.image("star4", "./assets/star4.png");
+      this.load.image("shootkeys", "./assets/shootkeys.png");
         // Loading the player
         this.load.spritesheet("player", "./assets/player.png", {
             frameWidth: 32,
@@ -43,25 +51,40 @@ export default class LevelScene3 extends Phaser.Scene {
       let div = document.getElementById("gameContainer");
       div.style.background= "linear-gradient(#0a0529, #180a5f, #170766, #450181,  #410377, #2b0050, #160129)";
 
-      //How to play instructions: 
-      this.keys = this.add.text(150, 5, "KEYS: ", {fontSize:"25px", fill: "#ffffff", fontStyle:"bold"})
-      this.add.image(180, 55, "arrows");
-      this.move = this.add.text(220, 55, "Move", {fontSize:"18px", fill: "#ffffff"});
-      this.spaceBar = this.add.image(180, 100, "spaceBar");
-      this.jump = this.add.text(220, 90, "Jump higher", {fontSize:"18px", fill: "#ffffff"});
-      this.shoot = this.add.image(170, 130, "shoot");
-      this.add.text(220, 120, "Shoot", {fontSize:"18px", fill: "#ffffff"});
-      this.add.text(220, 160, "Shoot at still", {fontSize:"18px", fill: "#ffffff"});
-      this.shootStill = this.add.image(183, 170, "shootStill");
-      this.info = this.add.text(gameWidth-420, 5, "Collect at least 100 points to win!", {fontSize:"20px", fill: "#ffffff", fontStyle:"bold"})
-      this.text = this.add.text(25, 5, "SCORE: ", {fontSize:"25px", fill: "#ffffff", fontStyle:"bold"})
-      this.scoreText = this.add.text(115, 5, "0", {fontSize:"25px", fill: "#0000000", fontStyle: "bold"})
+      // Things to collet information: 
+      this.text = this.add.text(gameWidth-775, gameHeight-995, "SCORE: ", {fontSize:"25px", fill: "#ffffff", fontStyle:"bold"})
+      const star1 = this.physics.add.image(30, 60, "star1");
+      this.add.text(45, 50, "1 point ", {fontSize:"20px", fill: "#ffffff", fontStyle:"bold"})
+      this.add.text(45, 90, "3 points", {fontSize:"20px", fill: "#ffffff", fontStyle:"bold"})
+      const star2 = this.physics.add.image(30, 100, "star2")
+      this.add.text(45, 140, "5 points", {fontSize:"20px", fill: "#ffffff", fontStyle:"bold"})
+      const star3 = this.physics.add.image(30, 140, "star3")
+      this.add.text(45, 190, "15 points", {fontSize:"20px", fill: "#ffffff", fontStyle:"bold"})
+      const star4 = this.physics.add.image(30, 200, "star4");
+      this.scoreText = this.add.text(gameWidth-685, gameHeight-995, "0", {fontSize:"25px", fill: "#ffffff", fontStyle: "bold"})
 
+      //How to play instructions: 
+      //How to play instructions: 
+      this.keys = this.add.text(gameWidth-605, gameHeight-995, "KEYS: ", {fontSize:"25px", fill: "#ffffff", fontStyle:"bold"})
+      this.add.image(gameWidth-570, gameHeight-945, "arrows");
+      this.move = this.add.text(gameWidth-525, gameHeight-945, "Move", {fontSize:"18px", fill: "#ffffff"});
+      this.spaceBar = this.add.image(gameWidth-570, gameHeight-900, "spaceBar");
+      this.jump = this.add.text(gameWidth-525, gameHeight-910, "Jump higher", {fontSize:"18px", fill: "#ffffff"});
+      this.add.text(gameWidth-525, gameHeight-870, "Shoot", {fontSize:"18px", fill: "#ffffff"});
+      this.shoot = this.add.image(gameWidth-570, gameHeight-860, "shootkeys");
+      this.info = this.add.text(gameWidth-470, gameHeight-995, "Collect at least 50 points to succeed!", {fontSize:"20px", fill: "#ffffff", fontStyle:"bold"})
+ 
       // Platforms: 
       this.platformGroup = this.physics.add.group({
         immovable: true,
         allowGravity: false
       });
+
+      this.moonplatformGroup = this.physics.add.group({
+        immovable: false,
+        allowGravity: true
+      });
+
 
       //Smaller platforms
       this.smallPlatformGroup = this.physics.add.group({
@@ -77,27 +100,29 @@ export default class LevelScene3 extends Phaser.Scene {
 
     this.startplatform = this.physics.add.staticSprite(gameWidth/5.5, gameHeight/(1/0.87), "moonplatform");
     this.endPlatform = this.physics.add.staticSprite(gameWidth-100, gameHeight-850, "moonplatform");
-
-    let platformNum = Phaser.Math.Between(0, 10);
+    this.finishLine = this.add.staticSprite(gameWidth-75, gameHeight-885, "finish_line");
+    let platformNum = Phaser.Math.Between(0, 12);
     let smallPlatformNum = Phaser.Math.Between(5, 10);
     //let skeletonPlatformNum = Phaser.Math.Between(3, 15);
     for(let i = 0; i < platformNum; i++) {
       this.platformGroup.create(Phaser.Math.Between(30, gameWidth), Phaser.Math.Between(210, gameHeight), "moonplatform");
     }
-
     for(let i = 0; i < smallPlatformNum; i++) {
       this.smallPlatformGroup.create(Phaser.Math.Between(210, gameWidth), Phaser.Math.Between(180, gameHeight), "smallmoonPlatform");
     }
 
-    /*for (let i= 0; i < skeletonPlatformNum; i++) {
-      this.skeletonPlatformGroup.create(Phaser.Math.Between(210, gameWidth), Phaser.Math.Between(180, gameHeight), "mountainsmallSkeletonPlatform");
-    }*/
+    for(let i = 0; i < smallPlatformNum; i++) {
+      this.moonplatformGroup.create(Phaser.Math.Between(210, gameWidth), Phaser.Math.Between(180, gameHeight), "smallmoonPlatform");
+    }
 
     this.player = this.physics.add.sprite(gameWidth/5.5, gameHeight/(1/0.80), "player")
     this.player.body.gravity.y = gameOptions.playerGravity;
     this.physics.add.collider(this.player, this.startplatform);
     this.physics.add.collider(this.player, this.platformGroup);
     this.physics.add.collider(this.player, this.smallPlatformGroup);
+    this.physics.add.collider(this.player, this.moonplatformGroup, this.movePlatform, null, this); 
+    this.physics.add.collider(this.player, this.finishLine, this.finishLevel, null, this);
+    this.physics.add.collider(this.player, this.endPlatform);
     //this.physics.add.collider(this.player, this.skeletonPlatformGroup);
     this.cursors = this.input.keyboard.createCursorKeys();
 
@@ -157,8 +182,8 @@ export default class LevelScene3 extends Phaser.Scene {
           this.info.setText("You won!")
           this.player.body.velocity.x = 0; 
           this.player.body.velocity.y = 0; 
-          gameScore[1].score = this.score;
-          this.scene.start("LevelScene3", this.data);
+          gameScore[2].score = this.score;
+          this.scene.start("FinishScene", this.data);
     
         }
       }

@@ -616,8 +616,7 @@ class LevelScene1 extends (0, _phaserDefault.default).Scene {
         this.load.image("cactusPlatform", "./assets/cactusWithPlatform.png");
         this.load.image("arrows", "./assets/arrows.png");
         this.load.image("spaceBar", "./assets/spaceBar.png");
-        this.load.image("shoot", "./assets/shoot.png");
-        this.load.image("shootStill", "./assets/shootStill.png");
+        this.load.image("shootkeys", "./assets/shootkeys.png");
         this.load.image("test", "./assets/test.png");
         this.load.spritesheet("player", "./assets/player.png", {
             frameWidth: 32,
@@ -665,7 +664,7 @@ class LevelScene1 extends (0, _phaserDefault.default).Scene {
         for(let i = 0; i < platformNum; i++)this.platformGroup.create((0, _phaserDefault.default).Math.Between(30, gameWidth), (0, _phaserDefault.default).Math.Between(210, gameHeight), "platform");
         //this.cactus.create(Phaser.Math.Between(30, game.config.width), Phaser.Math.Between(210, game.config.height), "cactus")
         let cactusPlatformNum = (0, _phaserDefault.default).Math.Between(0, 15);
-        let cactusNum = (0, _phaserDefault.default).Math.Between(0, 10);
+        let cactusNum = (0, _phaserDefault.default).Math.Between(5, 10);
         for(let i = 0; i < cactusPlatformNum; i++)this.cactusPlatformGroup.create((0, _phaserDefault.default).Math.Between(30, gameWidth), (0, _phaserDefault.default).Math.Between(210, gameHeight), "cactusPlatform");
         for(let i = 0; i < cactusNum; i++)this.cactusGroup.create((0, _phaserDefault.default).Math.Between(30, gameWidth), (0, _phaserDefault.default).Math.Between(210, gameHeight), "cactus");
         for(let i = 0; i < smallPlatformNum; i++)this.smallPlatformGroup.create((0, _phaserDefault.default).Math.Between(210, gameWidth), (0, _phaserDefault.default).Math.Between(180, gameHeight), "small_platform");
@@ -692,67 +691,71 @@ class LevelScene1 extends (0, _phaserDefault.default).Scene {
         this.physics.add.collider(this.whitePopsicleGroup, this.smallPlatformGroup);
         this.physics.add.collider(this.bluePopsicleGroup, this.platformGroup);
         this.physics.add.collider(this.bluePopsicleGroup, this.smallPlatformGroup);
-        for(let i = 0; i < 15; i++)this.yellowPopsicleGroup.create((0, _phaserDefault.default).Math.Between(30, gameWidth), (0, _phaserDefault.default).Math.Between(210, gameHeight), "popsicle1");
-        for(let i = 0; i < 10; i++)this.pinkPopsicleGroup.create((0, _phaserDefault.default).Math.Between(30, gameWidth), (0, _phaserDefault.default).Math.Between(210, gameHeight), "popsicle2");
-        for(let i = 0; i < 5; i++)this.whitePopsicleGroup.create((0, _phaserDefault.default).Math.Between(30, gameWidth), (0, _phaserDefault.default).Math.Between(210, gameHeight), "popsicle3");
-        for(let i = 0; i < 3; i++)this.bluePopsicleGroup.create((0, _phaserDefault.default).Math.Between(30, gameWidth), (0, _phaserDefault.default).Math.Between(210, gameHeight), "popsicle4");
+        let yellowNum = (0, _phaserDefault.default).Math.Between(10, 20);
+        let pinkNum = (0, _phaserDefault.default).Math.Between(5, 10);
+        let whiteNum = (0, _phaserDefault.default).Math.Between(3, 6);
+        let blueNum = (0, _phaserDefault.default).Math.Between(1, 2);
+        for(let i = 0; i < yellowNum; i++)this.yellowPopsicleGroup.create((0, _phaserDefault.default).Math.Between(30, gameWidth), (0, _phaserDefault.default).Math.Between(210, gameHeight), "popsicle1");
+        for(let i = 0; i < pinkNum; i++)this.pinkPopsicleGroup.create((0, _phaserDefault.default).Math.Between(30, gameWidth), (0, _phaserDefault.default).Math.Between(210, gameHeight), "popsicle2");
+        for(let i = 0; i < whiteNum; i++)this.whitePopsicleGroup.create((0, _phaserDefault.default).Math.Between(30, gameWidth), (0, _phaserDefault.default).Math.Between(210, gameHeight), "popsicle3");
+        for(let i = 0; i < blueNum; i++)this.bluePopsicleGroup.create((0, _phaserDefault.default).Math.Between(30, gameWidth), (0, _phaserDefault.default).Math.Between(210, gameHeight), "popsicle4");
         //Adding the score board and points
-        this.text = this.add.text(25, 5, "SCORE: ", {
+        this.text = this.add.text(gameWidth - 775, gameHeight - 995, "SCORE: ", {
             fontSize: "25px",
             fill: "#ffffff",
             fontStyle: "bold"
         });
-        const yellowPopsicle = this.physics.add.image(30, 60, "popsicle1");
-        this.yellowText = this.add.text(45, 50, "1 point ", {
+        const yellowPopsicle = this.physics.add.image(gameWidth - 770, gameHeight - 940, "popsicle1");
+        this.yellowText = this.add.text(gameWidth - 755, gameHeight - 950, "1 point ", {
             fontSize: "20px",
             fill: "#ffffff",
             fontStyle: "bold"
         });
-        this.pinkText = this.add.text(45, 100, "3 points", {
+        this.pinkText = this.add.text(gameWidth - 755, gameHeight - 900, "3 points", {
             fontSize: "20px",
             fill: "#ffffff",
             fontStyle: "bold"
         });
-        const pinkPopsicle = this.physics.add.image(30, 110, "popsicle2");
-        this.whiteText = this.add.text(45, 150, "5 points", {
+        const pinkPopsicle = this.physics.add.image(gameWidth - 770, gameHeight - 890, "popsicle2");
+        this.whiteText = this.add.text(gameWidth - 755, gameHeight - 850, "5 points", {
             fontSize: "20px",
             fill: "#ffffff",
             fontStyle: "bold"
         });
-        const whitePopsicle = this.physics.add.image(30, 160, "popsicle3");
-        this.blueText = this.add.text(45, 200, "10 points", {
+        const whitePopsicle = this.physics.add.image(gameWidth - 770, gameHeight - 840, "popsicle3");
+        this.blueText = this.add.text(gameWidth - 755, gameHeight - 800, "10 points", {
             fontSize: "20px",
             fill: "#ffffff",
             fontStyle: "bold"
         });
-        const bluePopsicle = this.physics.add.image(30, 210, "popsicle4");
-        this.scoreText = this.add.text(115, 5, "0", {
+        const bluePopsicle = this.physics.add.image(gameWidth - 770, gameHeight - 790, "popsicle4");
+        this.scoreText = this.add.text(gameWidth - 685, gameHeight - 995, "0", {
             fontSize: "25px",
             fill: "#0000000",
             fontStyle: "bold"
         });
         //How to play instructions: 
-        this.keys = this.add.text(150, 5, "KEYS: ", {
+        this.keys = this.add.text(gameWidth - 605, gameHeight - 995, "KEYS: ", {
             fontSize: "25px",
             fill: "#ffffff",
             fontStyle: "bold"
         });
-        this.add.image(180, 55, "arrows");
-        this.move = this.add.text(220, 55, "Move", {
+        this.add.image(gameWidth - 570, gameHeight - 945, "arrows");
+        this.move = this.add.text(gameWidth - 525, gameHeight - 945, "Move", {
             fontSize: "18px",
             fill: "#ffffff"
         });
-        this.spaceBar = this.add.image(180, 100, "spaceBar");
-        this.jump = this.add.text(220, 90, "Jump higher", {
+        this.spaceBar = this.add.image(gameWidth - 570, gameHeight - 900, "spaceBar");
+        this.jump = this.add.text(gameWidth - 525, gameHeight - 910, "Jump higher", {
             fontSize: "18px",
             fill: "#ffffff"
         });
-        this.add.text(225, 145, "Shoot", {
+        this.add.text(gameWidth - 525, gameHeight - 870, "Shoot", {
             fontSize: "18px",
             fill: "#ffffff"
         });
-        this.shoot = this.add.image(185, 150, "shootStill");
-        this.info = this.add.text(gameWidth - 420, 5, "Collect at least 50 points to win!", {
+        this.shoot = this.add.image(gameWidth - 570, gameHeight - 860, "shootkeys");
+        this.info = this.add.text(gameWidth - 470, gameHeight - 995, "Collect at least 50 points to succeed!", {
             fontSize: "20px",
             fill: "#ffffff",
             fontStyle: "bold"
@@ -844,8 +847,8 @@ class LevelScene1 extends (0, _phaserDefault.default).Scene {
         }
         start.body.velocity.x = (0, _phaserDefault.default).Math.Between(-100, 100);
         this.enemyMoving = true;
-        this.player.x = this.startplatform.x;
-        this.player.y = this.startplatform.y;
+        this.player.x = gameWidth / 2;
+        this.player.y = gameHeight / 1.25;
     }
     cactusKill(player, start) {
         start.disableBody(true, true);
@@ -884,7 +887,6 @@ class LevelScene1 extends (0, _phaserDefault.default).Scene {
     }
     movePlatform(player, start) {
         start.body.velocity.x = (0, _phaserDefault.default).Math.Between(-150, 150);
-        start.body.velocity.y = (0, _phaserDefault.default).Math.Between(-150, 150);
     }
     update() {
         if (this.cactusPlatformGroup.x > gameWidth || this.cactusPlatformGroup.x < 0) this.cactusPlatformGroup.x = gameWidth / 2;
@@ -935,9 +937,8 @@ class LevelScene1 extends (0, _phaserDefault.default).Scene {
         }
         //this.physics.add.overlap(this.player, this.finish, this.finishLevel, null, this)
         if (this.player.x > gameWidth || this.player.x < 0) {
-            this.player.x = this.startplatform.x;
-            this.player.y = this.startplatform.y;
-            this.score -= 1;
+            this.player.x = gameWidth / 2;
+            this.player.y = gameHeight / 1.25;
         }
     /*if (this.score >= 50) {
       gameScore[0].score = this.score; 

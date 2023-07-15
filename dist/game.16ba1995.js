@@ -589,6 +589,7 @@ class LevelScene2 extends (0, _phaserDefault.default).Scene {
     constructor(){
         super("LevelScene2");
         this.score = 0;
+        this.enemyMoving = false;
     }
     preload() {
         // Loading the player
@@ -598,7 +599,7 @@ class LevelScene2 extends (0, _phaserDefault.default).Scene {
         this.load.image("fireball", "./assets/fireball.png");
         this.load.image("arrows", "./assets/arrows.png");
         this.load.image("spaceBar", "./assets/spaceBar.png");
-        this.load.image("shootStill", "./assets/shootStill.png");
+        this.load.image("shootkeys", "./assets/shootkeys.png");
         this.load.image("topaz", "./assets/topaz.png");
         this.load.image("emerald", "./assets/emerald.png");
         this.load.image("bluestone", "./assets/bluestone.png");
@@ -622,7 +623,12 @@ class LevelScene2 extends (0, _phaserDefault.default).Scene {
         //This is based on this website: https://stackoverflow.com/questions/59332460/how-to-set-background-color-of-phaser-3-game-during-runtime
         let div = document.getElementById("gameContainer");
         div.style.background = div.style.background = "linear-gradient(#113388, #114488, #247899)";
-        //Things to collect info
+        //Things to collect info + scores
+        this.text = this.add.text(gameWidth - 775, gameHeight - 995, "SCORE: ", {
+            fontSize: "25px",
+            fill: "#ffffff",
+            fontStyle: "bold"
+        });
         const coal = this.physics.add.image(30, 60, "coal");
         this.add.text(45, 50, "1 point ", {
             fontSize: "20px",
@@ -653,45 +659,36 @@ class LevelScene2 extends (0, _phaserDefault.default).Scene {
             fontStyle: "bold"
         });
         const diamond = this.physics.add.image(30, 240, "diamond");
-        //How to play instructions: 
-        this.keys = this.add.text(150, 5, "KEYS: ", {
-            fontSize: "25px",
-            fill: "#ffffff",
-            fontStyle: "bold"
-        });
-        this.add.image(180, 55, "arrows");
-        this.move = this.add.text(220, 55, "Move", {
-            fontSize: "18px",
-            fill: "#ffffff"
-        });
-        this.spaceBar = this.add.image(180, 100, "spaceBar");
-        this.jump = this.add.text(220, 90, "Jump higher", {
-            fontSize: "18px",
-            fill: "#ffffff"
-        });
-        this.shoot = this.add.image(170, 130, "shoot");
-        this.add.text(220, 120, "Shoot", {
-            fontSize: "18px",
-            fill: "#ffffff"
-        });
-        this.add.text(220, 160, "Shoot at still", {
-            fontSize: "18px",
-            fill: "#ffffff"
-        });
-        this.shootStill = this.add.image(183, 170, "shootStill");
-        this.info = this.add.text(gameWidth - 420, 5, "Collect at least 100 points to win!", {
-            fontSize: "20px",
-            fill: "#ffffff",
-            fontStyle: "bold"
-        });
-        this.text = this.add.text(25, 5, "SCORE: ", {
-            fontSize: "25px",
-            fill: "#ffffff",
-            fontStyle: "bold"
-        });
         this.scoreText = this.add.text(115, 5, "0", {
             fontSize: "25px",
             fill: "#0000000",
+            fontStyle: "bold"
+        });
+        //How to play instructions: 
+        //How to play instructions: 
+        this.keys = this.add.text(195, 5, "KEYS: ", {
+            fontSize: "25px",
+            fill: "#ffffff",
+            fontStyle: "bold"
+        });
+        this.add.image(230, 55, "arrows");
+        this.move = this.add.text(275, 55, "Move", {
+            fontSize: "18px",
+            fill: "#ffffff"
+        });
+        this.spaceBar = this.add.image(230, 100, "spaceBar");
+        this.jump = this.add.text(275, 90, "Jump higher", {
+            fontSize: "18px",
+            fill: "#ffffff"
+        });
+        this.add.text(275, 130, "Shoot", {
+            fontSize: "18px",
+            fill: "#ffffff"
+        });
+        this.shoot = this.add.image(230, 140, "shootkeys");
+        this.info = this.add.text(gameWidth - 420, 5, "Collect at least 100 points to pass the level!", {
+            fontSize: "20px",
+            fill: "#ffffff",
             fontStyle: "bold"
         });
         // Platforms: 
@@ -724,42 +721,59 @@ class LevelScene2 extends (0, _phaserDefault.default).Scene {
         this.coalGroup = this.physics.add.group({});
         this.bluestoneGroup = this.physics.add.group({});
         this.diamondGroup = this.physics.add.group({});
-        for(let i = 0; i < 20; i++)this.coalGroup.create((0, _phaserDefault.default).Math.Between(30, gameWidth), (0, _phaserDefault.default).Math.Between(210, gameHeight), "coal");
-        for(let i = 0; i < 15; i++)this.emeraldGroup.create((0, _phaserDefault.default).Math.Between(30, gameWidth), (0, _phaserDefault.default).Math.Between(210, gameHeight), "emerald");
-        for(let i = 0; i < 10; i++)this.topazGroup.create((0, _phaserDefault.default).Math.Between(30, gameWidth), (0, _phaserDefault.default).Math.Between(210, gameHeight), "topaz");
-        for(let i = 0; i < 5; i++)this.bluestoneGroup.create((0, _phaserDefault.default).Math.Between(30, gameWidth), (0, _phaserDefault.default).Math.Between(210, gameHeight), "bluestone");
-        for(let i = 0; i < 3; i++)this.diamondGroup.create((0, _phaserDefault.default).Math.Between(30, gameWidth), (0, _phaserDefault.default).Math.Between(210, gameHeight), "diamond");
+        let coalNum = (0, _phaserDefault.default).Math.Between(9, 18);
+        let emeraldNum = (0, _phaserDefault.default).Math.Between(2, 4);
+        let topazNum = (0, _phaserDefault.default).Math.Between(5, 10);
+        let bluestoneNum = (0, _phaserDefault.default).Math.Between(3, 6);
+        let diamondNum = (0, _phaserDefault.default).Math.Between(2, 4);
+        for(let i = 0; i < coalNum; i++)this.coalGroup.create((0, _phaserDefault.default).Math.Between(30, gameWidth), (0, _phaserDefault.default).Math.Between(210, gameHeight), "coal");
+        for(let i = 0; i < emeraldNum; i++)this.emeraldGroup.create((0, _phaserDefault.default).Math.Between(30, gameWidth), (0, _phaserDefault.default).Math.Between(210, gameHeight), "emerald");
+        for(let i = 0; i < topazNum; i++)this.topazGroup.create((0, _phaserDefault.default).Math.Between(30, gameWidth), (0, _phaserDefault.default).Math.Between(210, gameHeight), "topaz");
+        for(let i = 0; i < bluestoneNum; i++)this.bluestoneGroup.create((0, _phaserDefault.default).Math.Between(30, gameWidth), (0, _phaserDefault.default).Math.Between(210, gameHeight), "bluestone");
+        for(let i = 0; i < diamondNum; i++)this.diamondGroup.create((0, _phaserDefault.default).Math.Between(30, gameWidth), (0, _phaserDefault.default).Math.Between(210, gameHeight), "diamond");
         this.startPlatform = this.physics.add.staticSprite(gameWidth / 5.5, gameHeight / (1 / 0.88), "mountainplatform");
         this.endPlatform = this.physics.add.staticSprite(gameWidth - 100, gameHeight - 850, "mountainplatform");
-        this.finish = this.add.image(gameWidth - 140, gameHeight - 870, "finish_line");
+        this.finishLine = this.add.staticSprite(gameWidth - 75, gameHeight - 885, "finish_line");
         let platformNum = (0, _phaserDefault.default).Math.Between(3, 10);
         let smallPlatformNum = (0, _phaserDefault.default).Math.Between(2, 15);
         let skeletonPlatformNum = (0, _phaserDefault.default).Math.Between(3, 15);
+        let stonemonsterNum = (0, _phaserDefault.default).Math.Between(5, 10);
         for(let i = 0; i < platformNum; i++){
             this.platformGroup.create((0, _phaserDefault.default).Math.Between(30, gameWidth), (0, _phaserDefault.default).Math.Between(210, gameHeight), "mountainplatform");
             this.stonemonsterGroup.create((0, _phaserDefault.default).Math.Between(30, gameWidth), (0, _phaserDefault.default).Math.Between(210, gameHeight), "stonemonster");
         }
+        for(let i = 0; i < stonemonsterNum; i++)this.stonemonsterGroup.create((0, _phaserDefault.default).Math.Between(30, gameWidth), (0, _phaserDefault.default).Math.Between(210, gameHeight), "stonemonster");
         for(let i = 0; i < smallPlatformNum; i++)this.smallPlatformGroup.create((0, _phaserDefault.default).Math.Between(210, gameWidth), (0, _phaserDefault.default).Math.Between(180, gameHeight), "mountainsmallPlatform");
         for(let i = 0; i < skeletonPlatformNum; i++)this.skeletonPlatformGroup.create((0, _phaserDefault.default).Math.Between(210, gameWidth), (0, _phaserDefault.default).Math.Between(180, gameHeight), "mountainsmallSkeletonPlatform");
         this.player = this.physics.add.sprite(gameWidth / 5.5, gameHeight / 1.25, "player");
         this.player.body.gravity.y = gameOptions.playerGravity;
+        // Colliders for the player: 
         this.physics.add.collider(this.player, this.platformGroup);
         this.physics.add.collider(this.player, this.smallPlatformGroup);
         this.physics.add.collider(this.player, this.skeletonPlatformGroup, this.movePlatform, null, this);
         this.physics.add.collider(this.player, this.startPlatform);
         this.physics.add.overlap(this.player, this.stonemonsterGroup, this.enemyAttack, null, this);
-        this.physics.add.collider(this.player, this.endPlatform, this.finishLevel, null, this);
         this.physics.add.overlap(this.player, this.coalGroup, this.collectCoal, null, this);
         this.physics.add.overlap(this.player, this.emeraldGroup, this.collectEmerald, null, this);
         this.physics.add.overlap(this.player, this.topazGroup, this.collectTopaz, null, this);
         this.physics.add.overlap(this.player, this.bluestoneGroup, this.collectBlueStone, null, this);
         this.physics.add.overlap(this.player, this.diamondGroup, this.collectDiamond, null, this);
         this.physics.add.overlap(this.player, this.stonemonsterGroup, this.moveStone, null, this);
+        this.physics.add.collider(this.player, this.finishLine, this.finishLevel, null, this);
+        this.physics.add.collider(this.player, this.endPlatform);
+        // Fireballs 
         this.physics.add.collider(this.fireBalls, this.platformGroup, this.disappear, null, this);
         this.physics.add.collider(this.fireBalls, this.smallPlatformGroup, this.disappear, null, this);
         this.physics.add.collider(this.fireBalls, this.skeletonPlatformGroup, this.disappear, null, this);
         this.physics.add.overlap(this.fireBalls, this.stonemonsterGroup, this.enemyKill, null, this);
+        // Stone monsters (enemy of this level) 
+        this.physics.add.collider(this.stonemonsterGroup, this.platformGroup, this.stopEnemy, null, this);
+        this.physics.add.collider(this.stonemonsterGroup, this.smallPlatformGroup, this.stopEnemy, null, this);
+        this.physics.add.collider(this.stonemonsterGroup, this.skeletonPlatformGroup, this.stopEnemy, null, this);
         this.cursors = this.input.keyboard.createCursorKeys();
+    }
+    stopEnemy(start) {
+        if (this.enemyMoving == true && start.body.touching.down || this.enemyMoving == true && start.body.x > gameWidth) start.body.velocity.y = 0;
     }
     collectCoal(player, start) {
         start.disableBody(true, true);
@@ -812,19 +826,20 @@ class LevelScene2 extends (0, _phaserDefault.default).Scene {
         start.body.velocity.y = (0, _phaserDefault.default).Math.Between(50, 150);
     }
     enemyAttack(player, start) {
-        if (this.score > 10) {
+        if (this.score > 0) {
             this.score -= 10;
             this.scoreText.setText(this.score);
         }
-        start.body.velocity.y = (0, _phaserDefault.default).Math.Between(-100, 100);
+        start.body.velocity.y = (0, _phaserDefault.default).Math.Between(50, 150);
         this.enemyMoving = true;
-        this.player.x = this.startPlatform.x;
-        this.player.y = this.startPlatform.y;
+        this.player.x = gameWidth / 5.5;
+        this.player.y = gameHeight / 1.25;
     }
     disappear(start) {
         start.disableBody(false, true);
     }
-    finishLevel(player, start, gameData) {
+    finishLevel(player, start) {
+        console.log(this.score);
         if (this.score < 100) this.info.setText("Collect more points");
         else if (this.score >= 100) {
             this.info.setText("You won!");
@@ -882,8 +897,8 @@ class LevelScene2 extends (0, _phaserDefault.default).Scene {
         }
         //this.physics.add.overlap(this.player, this.finish, this.finishLevel, null, this)
         if (this.player.x > gameWidth || this.player.x < 0) {
-            this.player.x = this.startPlatform.x;
-            this.player.y = this.startPlatform.y;
+            this.player.x = gameWidth / 5.5;
+            this.player.y = gameHeight / 1.25;
         }
     }
 }

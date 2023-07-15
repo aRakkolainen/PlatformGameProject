@@ -47,7 +47,9 @@ export default class StartScene extends Phaser.Scene {
         }*/
         this.startText = this.add.text(gameConfig.scale.width/7, gameConfig.scale.height/((1/0.90)), "START NEW GAME BY PRESSING SPACE", { fontStyle: "bold", fontSize: "30px"});
         this.cursors = this.input.keyboard.createCursorKeys();
+        //This is based on this website: https://www.html5gamedevs.com/topic/42460-how-to-stretch-background-image-on-full-screen/
         this.background = this.add.image(gameConfig.scale.width/2, gameConfig.scale.height/2, "background");
+        this.background.setDisplaySize(gameWidth/4, gameHeight/4);
 
         //this.userinfo = this.add.text(gameConfig.width/3, gameConfig.heigth/1.5, "Give your username: ", {fontSize:"30px"});
         //usernameInput = this.add.dom(640, 360).createFromCache("form");

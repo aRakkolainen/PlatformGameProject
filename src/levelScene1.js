@@ -39,8 +39,7 @@ export default class LevelScene1 extends Phaser.Scene {
     this.load.image("cactusPlatform", "./assets/cactusWithPlatform.png");
     this.load.image("arrows", "./assets/arrows.png");
     this.load.image("spaceBar", "./assets/spaceBar.png");
-    this.load.image("shoot", "./assets/shoot.png");
-    this.load.image("shootStill", "./assets/shootStill.png");
+    this.load.image("shootkeys", "./assets/shootkeys.png");
     this.load.image("test", "./assets/test.png")
     this.load.spritesheet("player", "./assets/player.png", {
       frameWidth: 32,
@@ -95,7 +94,7 @@ export default class LevelScene1 extends Phaser.Scene {
   }
   //this.cactus.create(Phaser.Math.Between(30, game.config.width), Phaser.Math.Between(210, game.config.height), "cactus")
   let cactusPlatformNum = Phaser.Math.Between(0, 15);
-  let cactusNum = Phaser.Math.Between(0, 10);
+  let cactusNum = Phaser.Math.Between(5, 10);
   for (let i=0; i< cactusPlatformNum; i++) {
     this.cactusPlatformGroup.create(Phaser.Math.Between(30, gameWidth), Phaser.Math.Between(210, gameHeight), "cactusPlatform")
   }
@@ -132,41 +131,46 @@ export default class LevelScene1 extends Phaser.Scene {
     this.physics.add.collider(this.bluePopsicleGroup, this.platformGroup);
     this.physics.add.collider(this.bluePopsicleGroup, this.smallPlatformGroup);
 
-    for (let i=0; i < 15; i++) {
+
+    let yellowNum = Phaser.Math.Between(10, 20);
+    let pinkNum = Phaser.Math.Between(5, 10); 
+    let whiteNum = Phaser.Math.Between(3, 6); 
+    let blueNum = Phaser.Math.Between(1, 2);    
+    for (let i=0; i < yellowNum; i++) {
       this.yellowPopsicleGroup.create(Phaser.Math.Between(30, gameWidth), Phaser.Math.Between(210, gameHeight), "popsicle1")
     }
 
-    for (let i=0; i < 10; i++) {
+    for (let i=0; i < pinkNum; i++) {
       this.pinkPopsicleGroup.create(Phaser.Math.Between(30, gameWidth), Phaser.Math.Between(210, gameHeight), "popsicle2")
     }
 
-    for (let i=0; i < 5; i++) {
+    for (let i=0; i < whiteNum; i++) {
       this.whitePopsicleGroup.create(Phaser.Math.Between(30, gameWidth), Phaser.Math.Between(210, gameHeight), "popsicle3")
     }
 
-    for (let i = 0; i < 3; i++) {
+    for (let i = 0; i < blueNum; i++) {
       this.bluePopsicleGroup.create(Phaser.Math.Between(30, gameWidth), Phaser.Math.Between(210, gameHeight), "popsicle4")
     }
     //Adding the score board and points
-    this.text = this.add.text(25, 5, "SCORE: ", {fontSize:"25px", fill: "#ffffff", fontStyle:"bold"})
-    const yellowPopsicle = this.physics.add.image(30, 60, "popsicle1")
-    this.yellowText = this.add.text(45, 50, "1 point ", {fontSize:"20px", fill: "#ffffff", fontStyle:"bold"})
-    this.pinkText = this.add.text(45, 100, "3 points", {fontSize:"20px", fill: "#ffffff", fontStyle:"bold"})
-    const pinkPopsicle = this.physics.add.image(30, 110, "popsicle2")
-    this.whiteText = this.add.text(45, 150, "5 points", {fontSize:"20px", fill: "#ffffff", fontStyle:"bold"})
-    const whitePopsicle = this.physics.add.image(30, 160, "popsicle3")
-    this.blueText = this.add.text(45, 200, "10 points", {fontSize:"20px", fill: "#ffffff", fontStyle:"bold"})
-    const bluePopsicle = this.physics.add.image(30, 210, "popsicle4")
-    this.scoreText = this.add.text(115, 5, "0", {fontSize:"25px", fill: "#0000000", fontStyle: "bold"})
+    this.text = this.add.text(gameWidth-775, gameHeight-995, "SCORE: ", {fontSize:"25px", fill: "#ffffff", fontStyle:"bold"})
+    const yellowPopsicle = this.physics.add.image(gameWidth-770, gameHeight-940, "popsicle1")
+    this.yellowText = this.add.text(gameWidth-755, gameHeight-950, "1 point ", {fontSize:"20px", fill: "#ffffff", fontStyle:"bold"})
+    this.pinkText = this.add.text(gameWidth-755, gameHeight-900, "3 points", {fontSize:"20px", fill: "#ffffff", fontStyle:"bold"})
+    const pinkPopsicle = this.physics.add.image(gameWidth-770, gameHeight-890, "popsicle2")
+    this.whiteText = this.add.text(gameWidth-755, gameHeight-850, "5 points", {fontSize:"20px", fill: "#ffffff", fontStyle:"bold"})
+    const whitePopsicle = this.physics.add.image(gameWidth-770, gameHeight-840, "popsicle3")
+    this.blueText = this.add.text(gameWidth-755, gameHeight-800, "10 points", {fontSize:"20px", fill: "#ffffff", fontStyle:"bold"})
+    const bluePopsicle = this.physics.add.image(gameWidth-770, gameHeight-790, "popsicle4")
+    this.scoreText = this.add.text(gameWidth-685, gameHeight-995, "0", {fontSize:"25px", fill: "#0000000", fontStyle: "bold"})
     //How to play instructions: 
-    this.keys = this.add.text(150, 5, "KEYS: ", {fontSize:"25px", fill: "#ffffff", fontStyle:"bold"})
-    this.add.image(180, 55, "arrows");
-    this.move = this.add.text(220, 55, "Move", {fontSize:"18px", fill: "#ffffff"});
-    this.spaceBar = this.add.image(180, 100, "spaceBar");
-    this.jump = this.add.text(220, 90, "Jump higher", {fontSize:"18px", fill: "#ffffff"});
-    this.add.text(225, 145, "Shoot", {fontSize:"18px", fill: "#ffffff"});
-    this.shoot = this.add.image(185, 150, "shootStill");
-    this.info = this.add.text(gameWidth-420, 5, "Collect at least 50 points to win!", {fontSize:"20px", fill: "#ffffff", fontStyle:"bold"})
+    this.keys = this.add.text(gameWidth-605, gameHeight-995, "KEYS: ", {fontSize:"25px", fill: "#ffffff", fontStyle:"bold"})
+    this.add.image(gameWidth-570, gameHeight-945, "arrows");
+    this.move = this.add.text(gameWidth-525, gameHeight-945, "Move", {fontSize:"18px", fill: "#ffffff"});
+    this.spaceBar = this.add.image(gameWidth-570, gameHeight-900, "spaceBar");
+    this.jump = this.add.text(gameWidth-525, gameHeight-910, "Jump higher", {fontSize:"18px", fill: "#ffffff"});
+    this.add.text(gameWidth-525, gameHeight-870, "Shoot", {fontSize:"18px", fill: "#ffffff"});
+    this.shoot = this.add.image(gameWidth-570, gameHeight-860, "shootkeys");
+    this.info = this.add.text(gameWidth-470, gameHeight-995, "Collect at least 50 points to succeed!", {fontSize:"20px", fill: "#ffffff", fontStyle:"bold"})
     // overlaps for collecting items and interacting with enemies
     this.physics.add.overlap(this.player, this.yellowPopsicleGroup, this.collectYellowPopsicle, null, this)
     this.physics.add.overlap(this.player, this.pinkPopsicleGroup, this.collectPinkPopsicle, null, this)
@@ -248,8 +252,8 @@ export default class LevelScene1 extends Phaser.Scene {
     }
     start.body.velocity.x = Phaser.Math.Between(-100, 100);
     this.enemyMoving = true; 
-    this.player.x = this.startplatform.x;
-    this.player.y = this.startplatform.y;
+    this.player.x = gameWidth/2;
+    this.player.y = gameHeight/(1/0.80);
   }
   cactusKill(player, start) {
     start.disableBody(true, true);
@@ -290,9 +294,8 @@ export default class LevelScene1 extends Phaser.Scene {
   disappear(start) {
     start.disableBody(false, true); 
   }
-  movePlatform(player, start, ) {
+  movePlatform(player, start) {
     start.body.velocity.x = Phaser.Math.Between(-150, 150);
-    start.body.velocity.y = Phaser.Math.Between(-150, 150);
   }
 
   update() {
@@ -358,9 +361,8 @@ export default class LevelScene1 extends Phaser.Scene {
     }
     //this.physics.add.overlap(this.player, this.finish, this.finishLevel, null, this)
     if (this.player.x > gameWidth || this.player.x < 0) {
-      this.player.x = this.startplatform.x; 
-      this.player.y = this.startplatform.y;
-      this.score -= 1; 
+      this.player.x = gameWidth/2;
+      this.player.y = gameHeight/(1/0.80);
     }
 
     /*if (this.score >= 50) {
