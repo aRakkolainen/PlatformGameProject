@@ -39,7 +39,6 @@ export default class LevelScene2 extends Phaser.Scene {
 
     create(gameData) {
       this.data = gameData;
-      console.log(gameData.totalScore);
       gameConfig =  gameData.config;
       gameWidth = gameConfig.scale.width; 
       gameHeight = gameConfig.scale.height; 
@@ -135,7 +134,7 @@ export default class LevelScene2 extends Phaser.Scene {
 
     this.startPlatform = this.physics.add.staticSprite(gameWidth/5.5, gameHeight/(1/0.88), "mountainplatform");
     this.endPlatform = this.physics.add.staticSprite(gameWidth-100, gameHeight-850, "mountainplatform");
-    this.finishLine = this.add.staticSprite(gameWidth-75, gameHeight-885, "finish_line");
+    this.finish = this.physics.add.staticSprite(gameWidth-75, gameHeight-885, "finish_line");
     
     
     let platformNum = Phaser.Math.Between(3, 10);
@@ -172,7 +171,7 @@ export default class LevelScene2 extends Phaser.Scene {
     this.physics.add.overlap(this.player, this.bluestoneGroup, this.collectBlueStone, null, this);
     this.physics.add.overlap(this.player, this.diamondGroup, this.collectDiamond, null, this);
     this.physics.add.overlap(this.player, this.stonemonsterGroup, this.moveStone, null, this);
-    this.physics.add.collider(this.player, this.finishLine, this.finishLevel, null, this);
+    this.physics.add.collider(this.player, this.finish, this.finishLevel, null, this);
     this.physics.add.collider(this.player, this.endPlatform);
     // Fireballs 
     this.physics.add.collider(this.fireBalls, this.platformGroup, this.disappear, null, this);
@@ -241,7 +240,7 @@ export default class LevelScene2 extends Phaser.Scene {
 
     enemyKill(player, start) {
       start.disableBody(true, true);
-      this.score +=3;
+      this.score +=10;
       this.scoreText.setText(this.score)
     }
 

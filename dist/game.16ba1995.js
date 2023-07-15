@@ -614,7 +614,6 @@ class LevelScene2 extends (0, _phaserDefault.default).Scene {
     }
     create(gameData) {
         this.data = gameData;
-        console.log(gameData.totalScore);
         gameConfig = gameData.config;
         gameWidth = gameConfig.scale.width;
         gameHeight = gameConfig.scale.height;
@@ -733,7 +732,7 @@ class LevelScene2 extends (0, _phaserDefault.default).Scene {
         for(let i = 0; i < diamondNum; i++)this.diamondGroup.create((0, _phaserDefault.default).Math.Between(30, gameWidth), (0, _phaserDefault.default).Math.Between(210, gameHeight), "diamond");
         this.startPlatform = this.physics.add.staticSprite(gameWidth / 5.5, gameHeight / (1 / 0.88), "mountainplatform");
         this.endPlatform = this.physics.add.staticSprite(gameWidth - 100, gameHeight - 850, "mountainplatform");
-        this.finishLine = this.add.staticSprite(gameWidth - 75, gameHeight - 885, "finish_line");
+        this.finish = this.physics.add.staticSprite(gameWidth - 75, gameHeight - 885, "finish_line");
         let platformNum = (0, _phaserDefault.default).Math.Between(3, 10);
         let smallPlatformNum = (0, _phaserDefault.default).Math.Between(2, 15);
         let skeletonPlatformNum = (0, _phaserDefault.default).Math.Between(3, 15);
@@ -759,7 +758,7 @@ class LevelScene2 extends (0, _phaserDefault.default).Scene {
         this.physics.add.overlap(this.player, this.bluestoneGroup, this.collectBlueStone, null, this);
         this.physics.add.overlap(this.player, this.diamondGroup, this.collectDiamond, null, this);
         this.physics.add.overlap(this.player, this.stonemonsterGroup, this.moveStone, null, this);
-        this.physics.add.collider(this.player, this.finishLine, this.finishLevel, null, this);
+        this.physics.add.collider(this.player, this.finish, this.finishLevel, null, this);
         this.physics.add.collider(this.player, this.endPlatform);
         // Fireballs 
         this.physics.add.collider(this.fireBalls, this.platformGroup, this.disappear, null, this);
@@ -819,7 +818,7 @@ class LevelScene2 extends (0, _phaserDefault.default).Scene {
     }
     enemyKill(player, start) {
         start.disableBody(true, true);
-        this.score += 3;
+        this.score += 10;
         this.scoreText.setText(this.score);
     }
     movePlatform(player, start) {

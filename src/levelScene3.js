@@ -42,6 +42,7 @@ export default class LevelScene3 extends Phaser.Scene {
       gameWidth = gameConfig.scale.width; 
       gameHeight = gameConfig.scale.height;
       gameOptions = gameData.options;  
+      gameScore = gameData.totalScore; 
 
     //This is based on this website: https://www.html5gamedevs.com/topic/42460-how-to-stretch-background-image-on-full-screen/
       //const windowWidth = window.innerWidth; 
@@ -54,16 +55,16 @@ export default class LevelScene3 extends Phaser.Scene {
       // Things to collet information: 
       this.text = this.add.text(gameWidth-775, gameHeight-995, "SCORE: ", {fontSize:"25px", fill: "#ffffff", fontStyle:"bold"})
       const star1 = this.physics.add.image(30, 60, "star1");
-      this.add.text(45, 50, "1 point ", {fontSize:"20px", fill: "#ffffff", fontStyle:"bold"})
-      this.add.text(45, 90, "3 points", {fontSize:"20px", fill: "#ffffff", fontStyle:"bold"})
+      this.add.text(45, 50, "3 points ", {fontSize:"20px", fill: "#ffffff", fontStyle:"bold"})
+      this.add.text(45, 90, "5 points", {fontSize:"20px", fill: "#ffffff", fontStyle:"bold"})
       const star2 = this.physics.add.image(30, 100, "star2")
-      this.add.text(45, 140, "5 points", {fontSize:"20px", fill: "#ffffff", fontStyle:"bold"})
+      this.add.text(45, 140, "10 points", {fontSize:"20px", fill: "#ffffff", fontStyle:"bold"})
       const star3 = this.physics.add.image(30, 140, "star3")
-      this.add.text(45, 190, "15 points", {fontSize:"20px", fill: "#ffffff", fontStyle:"bold"})
+      this.add.text(45, 190, "20 points", {fontSize:"20px", fill: "#ffffff", fontStyle:"bold"})
       const star4 = this.physics.add.image(30, 200, "star4");
       this.scoreText = this.add.text(gameWidth-685, gameHeight-995, "0", {fontSize:"25px", fill: "#ffffff", fontStyle: "bold"})
 
-      //How to play instructions: 
+
       //How to play instructions: 
       this.keys = this.add.text(gameWidth-605, gameHeight-995, "KEYS: ", {fontSize:"25px", fill: "#ffffff", fontStyle:"bold"})
       this.add.image(gameWidth-570, gameHeight-945, "arrows");
@@ -91,19 +92,22 @@ export default class LevelScene3 extends Phaser.Scene {
         immovable: true,
         allowGravity: false
     })
+    this.alienGroup = this.physics.add.group({
+      immovable: false, 
+      allowGravity: true
+    })
 
     //Fire balls: 
     this.fireBalls = this.physics.add.group(
       {defaultKey: 'fireball', 
-    maxSize: 10, }
+    maxSize: 50, }
     );
 
     this.startplatform = this.physics.add.staticSprite(gameWidth/5.5, gameHeight/(1/0.87), "moonplatform");
     this.endPlatform = this.physics.add.staticSprite(gameWidth-100, gameHeight-850, "moonplatform");
-    this.finishLine = this.add.staticSprite(gameWidth-75, gameHeight-885, "finish_line");
+    this.finishLine = this.physics.add.staticSprite(gameWidth-75, gameHeight-885, "finish_line");
     let platformNum = Phaser.Math.Between(0, 12);
     let smallPlatformNum = Phaser.Math.Between(5, 10);
-    //let skeletonPlatformNum = Phaser.Math.Between(3, 15);
     for(let i = 0; i < platformNum; i++) {
       this.platformGroup.create(Phaser.Math.Between(30, gameWidth), Phaser.Math.Between(210, gameHeight), "moonplatform");
     }
@@ -115,6 +119,19 @@ export default class LevelScene3 extends Phaser.Scene {
       this.moonplatformGroup.create(Phaser.Math.Between(210, gameWidth), Phaser.Math.Between(180, gameHeight), "smallmoonPlatform");
     }
 
+    for(let i = 0; i < smallPlatformNum; i++) {
+      this.moonplatformGroup.create(Phaser.Math.Between(210, gameWidth), Phaser.Math.Between(180, gameHeight), "smallmoonPlatform");
+    }
+    let alienNum = Phaser.Math.Between(10, 15);
+    /*for(let i = 0; i < alienNum; i++) {
+      this.alien = this.add.spritesheet(Phaser.Math.Between(210, gameWidth), Phaser.Math.Between(180, gameHeight), "alien")
+      //this.alienGroup.create(Phaser.Math.Between(210, gameWidth), Phaser.Math.Between(180, gameHeight), "alien");
+      this.alien.setActive(true);
+      this.alien.setVelocityX(Phaser.Math.Between(-50, 50));
+      this.alien.setVelocityY(Phaser.Math.Between(-50, 50));
+    }*/
+
+
     this.player = this.physics.add.sprite(gameWidth/5.5, gameHeight/(1/0.80), "player")
     this.player.body.gravity.y = gameOptions.playerGravity;
     this.physics.add.collider(this.player, this.startplatform);
@@ -123,39 +140,64 @@ export default class LevelScene3 extends Phaser.Scene {
     this.physics.add.collider(this.player, this.moonplatformGroup, this.movePlatform, null, this); 
     this.physics.add.collider(this.player, this.finishLine, this.finishLevel, null, this);
     this.physics.add.collider(this.player, this.endPlatform);
+
+    // Things to collect: 
+    let starNum = Phaser.Math.Between(5, 10);
+    let starNum2 = Phaser.Math.Between(7, 14);
+    let starNum3 = Phaser.Math.Between(4, 8);
+    let starNum4 = Phaser.Math.Between(2, 4);
+    this.starGroup1 = this.physics.add.group({})
+    this.starGroup2 = this.physics.add.group({})
+    this.starGroup3 = this.physics.add.group({})
+    this.starGroup4 = this.physics.add.group({})
+
+
+    for(let i = 0; i < starNum; i++) {
+      this.starGroup1.create(Phaser.Math.Between(30, gameWidth), Phaser.Math.Between(210, gameHeight), "star1")
+    }
+
+    for(let i = 0; i < starNum2; i++) {
+      this.starGroup2.create(Phaser.Math.Between(30, gameWidth), Phaser.Math.Between(210, gameHeight), "star2")
+    }
+
+    for(let i = 0; i < starNum3; i++) {
+      this.starGroup3.create(Phaser.Math.Between(30, gameWidth), Phaser.Math.Between(210, gameHeight), "star3")
+    }
+
+    for(let i = 0; i < starNum4; i++) {
+      this.starGroup4.create(Phaser.Math.Between(30, gameWidth), Phaser.Math.Between(210, gameHeight), "star4")
+    }
+    
+    this.physics.add.overlap(this.player, this.starGroup1, this.collectStar1, null, this); 
+    this.physics.add.overlap(this.player, this.starGroup2, this.collectStar2, null, this);
+    this.physics.add.overlap(this.player, this.starGroup3, this.collectStar3, null, this);
+    this.physics.add.overlap(this.player, this.starGroup4, this.collectStar4, null, this);
     //this.physics.add.collider(this.player, this.skeletonPlatformGroup);
     this.cursors = this.input.keyboard.createCursorKeys();
+  }
 
-      /*this.anims.create({
-        key: "left", 
-        frames: this.anims.generateFrameNumbers("player", {start: 0, end: 3}), 
-        frameRate: 10,
-        repeat: -1
-    })
+  collectStar1(player, start) {
+    start.disableBody(true, true);
+    this.score += 3;  
+    this.scoreText.setText(this.score);
+  }
 
-    this.anims.create({
-        key: "turn", 
-        frames: [{key: "player", frame: 4}],
-        frameRate: 10, 
-    })
+  collectStar2(player, start) {
+    start.disableBody(true, true);
+    this.score += 5;  
+    this.scoreText.setText(this.score);
+  }
 
-    this.anims.create({
-        key: "right", 
-        frames: this.anims.generateFrameNumbers("player", {start: 5, end: 9}), 
-        frameRate: 10, 
-    })
-    this.anims.create({
-      key: "shootLeft", 
-      //frames: [{key: "player", frame: 0}],
-      frames: this.anims.generateFrameNumbers("player", {start: 3, end: 0}),
-      frameRate: 10,
-    })
-    this.anims.create({
-      key: "shootRight", 
-      frames: this.anims.generateFrameNumbers("player", {start: 8, end:5}), 
-      frameRate: 10,
-    })*/
+  collectStar3(player, start) {
+    start.disableBody(true, true);
+    this.score += 15;  
+    this.scoreText.setText(this.score)
+  }
 
+  collectStar4(player, start) {
+    start.disableBody(true, true);
+    this.score += 20;  
+    this.scoreText.setText(this.score)
   }
     //Based on this: https://phasergames.com/phaser-3-physics-beginners/ 
     shootLeft(player) {
@@ -252,6 +294,6 @@ export default class LevelScene3 extends Phaser.Scene {
     this.player.x = this.startplatform.x; 
     this.player.y = this.startplatform.y;
   }
+}
 
-  }
 }

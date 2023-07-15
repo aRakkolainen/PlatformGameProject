@@ -85,7 +85,7 @@ export default class LevelScene1 extends Phaser.Scene {
   
     this.startplatform = this.physics.add.staticSprite(gameWidth/2, gameHeight/(1/0.87), "platform");
     this.endPlatform = this.physics.add.staticSprite(gameWidth-100, gameHeight-850, "platform");
-    this.finish = this.physics.add.staticSprite(gameWidth-75, gameHeight-885, "finish_line")
+    this.finish = this.physics.add.staticSprite(gameWidth-75, gameHeight-885, "finish_line");
   
     let platformNum = Phaser.Math.Between(3, 15);
     let smallPlatformNum = Phaser.Math.Between(3, 20);
