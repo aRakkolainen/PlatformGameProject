@@ -18,6 +18,7 @@ export default class StartScene extends Phaser.Scene {
     preload() {
         this.load.image("background", "./assets/startbackground.png");
         this.load.html("form", "form.html");
+         //Sound effects are downloaded from here: https://freesfx.co.uk/Default.aspx 
         this.load.audio("background", "./assets/background1.mp3");
     }
 
@@ -32,7 +33,7 @@ export default class StartScene extends Phaser.Scene {
         this.add.text(gameConfig.scale.width/4, gameConfig.scale.height/10, "SIMPLE PLATFORM GAME", {fontStyle: "bold", fontSize:"30px"});
         this.add.text(gameConfig.scale.width/4, gameConfig.scale.height-8.5, "By aRakkolainen", {fontStyle: "bold", fontSize:"25px"});
         // Source for getting username: https://www.thepolyglotdeveloper.com/2020/09/accept-text-input-user-phaser-game/ 
-        this.startText = this.add.text(gameConfig.scale.width/4.25, (gameConfig.scale.height)-200, "Welcome to play, Press SPACE to start new game", {fontStyle: "bold", fontSize: "18px"});
+        this.startText = this.add.text(gameConfig.scale.width/5, gameConfig.scale.height-200, "Welcome to play, Press SPACE to start new game", {fontStyle: "bold", fontSize: "18px"});
         this.usernameInput = this.add.dom(gameConfig.scale.width/2.5, gameConfig.scale.height-230).createFromCache("form"); 
         this.returnKey = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.ENTER);
         this.returnKey.on("down", event => {
@@ -42,6 +43,8 @@ export default class StartScene extends Phaser.Scene {
                 player.name = username.value; 
                 username.value="";
                 
+            } else {
+                this.startText.setText("Welcome to play, player! Press SPACE to start new game!"); 
             }
         })
         

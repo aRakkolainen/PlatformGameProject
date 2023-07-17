@@ -35,15 +35,6 @@ window.onload = () => {
             }
             },
         },
-        plugins: {
-            scene: [
-                {
-                    key: "rexUI", 
-                    plugin: RexUIPlugin, 
-                    mapping: 'rexUI'
-                }
-            ]
-        },
     scene: [ BootScene, StartScene, LevelScene1, LevelScene2, LevelScene3, FinishScene ]
 
     }
@@ -67,9 +58,9 @@ class BootScene extends Phaser.Scene {
             config: phaserConfig,
             options: gameOptions, 
             playerData:  {
-                name: "",
+                name: "player",
                 totalScore : [], //[{name: "level1", score: 0}, {name: "level2", score: 0}, {name: "level3", score: 0}],
-                enemiesKilled: [{name: "cactus", number: 0}, {name: "stonemonster", number: 0}, {name: "alien", number: 0}]
+                enemiesKilled: []
             }
         }
         this.scene.start("StartScene", this.data);

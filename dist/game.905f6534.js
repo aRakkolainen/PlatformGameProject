@@ -619,15 +619,6 @@ window.onload = ()=>{
                 }
             }
         },
-        plugins: {
-            scene: [
-                {
-                    key: "rexUI",
-                    plugin: (0, _uiPluginDefault.default),
-                    mapping: "rexUI"
-                }
-            ]
-        },
         scene: [
             BootScene,
             (0, _startSceneDefault.default),
@@ -653,22 +644,9 @@ class BootScene extends (0, _phaserDefault.default).Scene {
             config: phaserConfig,
             options: gameOptions,
             playerData: {
-                name: "",
+                name: "player",
                 totalScore: [],
-                enemiesKilled: [
-                    {
-                        name: "cactus",
-                        number: 0
-                    },
-                    {
-                        name: "stonemonster",
-                        number: 0
-                    },
-                    {
-                        name: "alien",
-                        number: 0
-                    }
-                ]
+                enemiesKilled: []
             }
         };
         this.scene.start("StartScene", this.data);
@@ -701,12 +679,12 @@ class LevelScene3 extends (0, _phaserDefault.default).Scene {
         super("LevelScene3");
         this.score = 0;
         this.enemiesKilledScore = 0;
+        this.info;
     }
     preload() {
         this.load.image("moonplatform", (0, _moonplatformPngDefault.default));
         this.load.image("smallmoonPlatform", (0, _smallmoonPlatformPngDefault.default));
         this.load.image("moonplatform2", "./assets/moonplatform2.png");
-        //this.load.image("mountainsmallSkeletonPlatform", "./assets/smallSkeletonplatform.png");
         this.load.image("fireball", "./assets/fireball.png");
         this.load.image("arrows", "./assets/arrows.png");
         this.load.image("spaceBar", "./assets/spaceBar.png");
@@ -717,8 +695,8 @@ class LevelScene3 extends (0, _phaserDefault.default).Scene {
         this.load.image("star2", "./assets/star2.png");
         this.load.image("star3", "./assets/star3.png");
         this.load.image("star4", "./assets/star4.png");
+        //Sound effects and music are downloaded from here: https://freesfx.co.uk/Default.aspx 
         this.load.audio("gunShot", "./assets/gunShot.mp3");
-        this.load.audio("hit", "./assets/hit.mp3");
         this.load.audio("bling", "./assets/bling.mp3");
         this.load.audio("background3", "./assets/background3.mp3");
         this.load.image("shootkeys", "./assets/shootkeys.png");
@@ -739,7 +717,7 @@ class LevelScene3 extends (0, _phaserDefault.default).Scene {
         gameHeight = gameConfig.scale.height;
         gameOptions = gameData.options;
         gameScore = gameData.totalScore;
-        // Sound effects: 
+        //Sound effect are added based on this website: https://www.thepolyglotdeveloper.com/2020/09/add-music-sounds-other-audio-phaser-game/ 
         blingSound = this.sound.add("bling", {
             loop: false
         });
@@ -750,6 +728,7 @@ class LevelScene3 extends (0, _phaserDefault.default).Scene {
             loop: true
         });
         backgroundMusic.play();
+        //This is based on this website: https://stackoverflow.com/questions/59332460/how-to-set-background-color-of-phaser-3-game-during-runtime
         let div = document.getElementById("gameContainer");
         div.style.background = "linear-gradient(#0a0529, #180a5f, #170766, #450181,  #410377, #2b0050, #160129)";
         // Things to collet information: 
@@ -758,30 +737,30 @@ class LevelScene3 extends (0, _phaserDefault.default).Scene {
             fill: "#ffffff",
             fontStyle: "bold"
         });
-        const star1 = this.physics.add.image(30, 60, "star1");
-        this.add.text(45, 50, "3 points ", {
+        const star1 = this.physics.add.image(gameWidth - 770, gameHeight - 940, "star1");
+        this.add.text(gameWidth - 755, gameHeight - 950, "3 points ", {
             fontSize: "20px",
             fill: "#ffffff",
             fontStyle: "bold"
         });
-        this.add.text(45, 90, "5 points", {
+        this.add.text(gameWidth - 755, gameHeight - 910, "5 points", {
             fontSize: "20px",
             fill: "#ffffff",
             fontStyle: "bold"
         });
-        const star2 = this.physics.add.image(30, 100, "star2");
-        this.add.text(45, 140, "10 points", {
+        const star2 = this.physics.add.image(gameWidth - 770, gameHeight - 100, "star2");
+        this.add.text(gameWidth - 755, gameHeight - 860, "10 points", {
             fontSize: "20px",
             fill: "#ffffff",
             fontStyle: "bold"
         });
-        const star3 = this.physics.add.image(30, 140, "star3");
-        this.add.text(45, 190, "20 points", {
+        const star3 = this.physics.add.image(gameWidth - 770, gameHeight - 860, "star3");
+        this.add.text(gameWidth - 755, gameHeight - 810, "20 points", {
             fontSize: "20px",
             fill: "#ffffff",
             fontStyle: "bold"
         });
-        const star4 = this.physics.add.image(30, 200, "star4");
+        const star4 = this.physics.add.image(gameWidth - 770, gameHeight - 800, "star4");
         this.scoreText = this.add.text(gameWidth - 685, gameHeight - 995, "0", {
             fontSize: "25px",
             fill: "#ffffff",
@@ -808,8 +787,8 @@ class LevelScene3 extends (0, _phaserDefault.default).Scene {
             fill: "#ffffff"
         });
         this.shoot = this.add.image(gameWidth - 570, gameHeight - 860, "shootkeys");
-        this.info = this.add.text(gameWidth - 470, gameHeight - 995, "Collect at least 150 points to succeed!", {
-            fontSize: "20px",
+        this.info = this.add.text(gameWidth - 450, gameHeight * 0.005, "Collect at least 150 points to succeed!", {
+            fontSize: "15px",
             fill: "#ffffff",
             fontStyle: "bold"
         });
@@ -832,7 +811,7 @@ class LevelScene3 extends (0, _phaserDefault.default).Scene {
             maxSize: 25,
             allowGravity: true
         });
-        //Fire balls: 
+        //Fire balls: (based on the source: https://phasergames.com/phaser-3-physics-beginners/)
         this.fireBalls = this.physics.add.group({
             defaultKey: "fireball",
             maxSize: 50
@@ -842,14 +821,11 @@ class LevelScene3 extends (0, _phaserDefault.default).Scene {
         this.finishLine = this.physics.add.staticSprite(gameWidth - 75, gameHeight - 885, "finish_line");
         let platformNum = (0, _phaserDefault.default).Math.Between(0, 12);
         let smallPlatformNum = (0, _phaserDefault.default).Math.Between(5, 10);
-        for(let i = 0; i < platformNum; i++)this.platformGroup.create((0, _phaserDefault.default).Math.Between(30, gameWidth), (0, _phaserDefault.default).Math.Between(210, gameHeight), "moonplatform");
-        for(let i = 0; i < smallPlatformNum; i++)this.smallPlatformGroup.create((0, _phaserDefault.default).Math.Between(210, gameWidth), (0, _phaserDefault.default).Math.Between(180, gameHeight), "smallmoonPlatform");
-        for(let i = 0; i < smallPlatformNum; i++)this.moonplatformGroup.create((0, _phaserDefault.default).Math.Between(210, gameWidth), (0, _phaserDefault.default).Math.Between(180, gameHeight), "smallmoonPlatform");
-        for(let i = 0; i < smallPlatformNum; i++)this.moonplatformGroup.create((0, _phaserDefault.default).Math.Between(210, gameWidth), (0, _phaserDefault.default).Math.Between(180, gameHeight), "smallmoonPlatform");
-        /*let alienNum = Phaser.Math.Between(10, 15);
-    for(let i = 0; i < alienNum; i++) {
-      this.alienGroup.create(Phaser.Math.Between(210, gameWidth), Phaser.Math.Between(180, gameHeight), "alien");
-    }*/ this.player = this.physics.add.sprite(gameWidth / 5.5, gameHeight / 1.25, "player");
+        for(let i = 0; i < platformNum; i++)this.platformGroup.create((0, _phaserDefault.default).Math.Between(0, gameWidth), (0, _phaserDefault.default).Math.Between(gameHeight - 800, gameHeight), "moonplatform");
+        for(let i = 0; i < smallPlatformNum; i++)this.smallPlatformGroup.create((0, _phaserDefault.default).Math.Between(0, gameWidth), (0, _phaserDefault.default).Math.Between(gameHeight - 800, gameHeight), "smallmoonPlatform");
+        for(let i = 0; i < smallPlatformNum; i++)this.moonplatformGroup.create((0, _phaserDefault.default).Math.Between(0, gameWidth), (0, _phaserDefault.default).Math.Between(gameHeight - 800, gameHeight), "smallmoonPlatform");
+        for(let i = 0; i < smallPlatformNum; i++)this.moonplatformGroup.create((0, _phaserDefault.default).Math.Between(0, gameWidth), (0, _phaserDefault.default).Math.Between(gameHeight - 800, gameHeight), "smallmoonPlatform");
+        this.player = this.physics.add.sprite(gameWidth / 5.5, gameHeight / 1.25, "player");
         this.player.body.gravity.y = gameOptions.playerGravity;
         this.physics.add.collider(this.player, this.startplatform);
         this.physics.add.collider(this.player, this.platformGroup);
@@ -872,15 +848,15 @@ class LevelScene3 extends (0, _phaserDefault.default).Scene {
         this.starGroup2 = this.physics.add.group({});
         this.starGroup3 = this.physics.add.group({});
         this.starGroup4 = this.physics.add.group({});
-        for(let i = 0; i < starNum; i++)this.starGroup1.create((0, _phaserDefault.default).Math.Between(30, gameWidth), (0, _phaserDefault.default).Math.Between(210, gameHeight), "star1");
-        for(let i = 0; i < starNum2; i++)this.starGroup2.create((0, _phaserDefault.default).Math.Between(30, gameWidth), (0, _phaserDefault.default).Math.Between(210, gameHeight), "star2");
-        for(let i = 0; i < starNum3; i++)this.starGroup3.create((0, _phaserDefault.default).Math.Between(30, gameWidth), (0, _phaserDefault.default).Math.Between(210, gameHeight), "star3");
-        for(let i = 0; i < starNum4; i++)this.starGroup4.create((0, _phaserDefault.default).Math.Between(30, gameWidth), (0, _phaserDefault.default).Math.Between(210, gameHeight), "star4");
+        //Setting the collectable items to random places
+        for(let i = 0; i < starNum; i++)this.starGroup1.create((0, _phaserDefault.default).Math.Between(0, gameWidth), (0, _phaserDefault.default).Math.Between(gameHeight - 800, gameHeight), "star1");
+        for(let i = 0; i < starNum2; i++)this.starGroup2.create((0, _phaserDefault.default).Math.Between(0, gameWidth), (0, _phaserDefault.default).Math.Between(gameHeight - 800, gameHeight), "star2");
+        for(let i = 0; i < starNum3; i++)this.starGroup3.create((0, _phaserDefault.default).Math.Between(0, gameWidth), (0, _phaserDefault.default).Math.Between(gameHeight - 800, gameHeight), "star3");
+        for(let i = 0; i < starNum4; i++)this.starGroup4.create((0, _phaserDefault.default).Math.Between(0, gameWidth), (0, _phaserDefault.default).Math.Between(gameHeight - 800, gameHeight), "star4");
         this.physics.add.overlap(this.player, this.starGroup1, this.collectStar1, null, this);
         this.physics.add.overlap(this.player, this.starGroup2, this.collectStar2, null, this);
         this.physics.add.overlap(this.player, this.starGroup3, this.collectStar3, null, this);
         this.physics.add.overlap(this.player, this.starGroup4, this.collectStar4, null, this);
-        //this.physics.add.collider(this.player, this.skeletonPlatformGroup);
         this.cursors = this.input.keyboard.createCursorKeys();
         this.timeTrigger = this.time.addEvent({
             callback: this.makeEnemies,
@@ -921,7 +897,7 @@ class LevelScene3 extends (0, _phaserDefault.default).Scene {
         this.score += 20;
         this.scoreText.setText(this.score);
     }
-    //Based on this: https://phasergames.com/phaser-3-physics-beginners/ 
+    //Shooting functions are based on this: https://phasergames.com/phaser-3-physics-beginners/ 
     shootLeft(player) {
         let fireBall = this.fireBalls.get(this.player.x, this.player.y);
         if (fireBall) {
@@ -967,13 +943,18 @@ class LevelScene3 extends (0, _phaserDefault.default).Scene {
             blingSound.play();
             this.player.body.velocity.x = 0;
             this.player.body.velocity.y = 0;
-            enemiesKillScore[2].number = this.enemiesKilledScore;
             this.total = {
                 name: "Level3",
                 score: this.score
             };
+            this.enemyKills = {
+                name: "alien",
+                number: this.enemiesKilledScore
+            };
+            enemiesKillScore.push(this.enemyKills);
             this.data.playerData.totalScore.push(this.total);
             backgroundMusic.stop();
+            this.score = 0;
             this.scene.start("FinishScene", this.data);
         }
     }
@@ -1010,7 +991,7 @@ class LevelScene3 extends (0, _phaserDefault.default).Scene {
             this.shootRight();
             this.player.anims.play("shootRight", true);
         }
-        // Based on this website: https://phasergames.com/phaser-3-physics-beginners/
+        // Reloading the fireballs is based on this website: https://phasergames.com/phaser-3-physics-beginners/
         this.fireBalls.children.each((function(b) {
             if (b.active) {
                 b.setActive(true);
@@ -1020,12 +1001,22 @@ class LevelScene3 extends (0, _phaserDefault.default).Scene {
         if (this.cursors.up.isDown && this.player.body.touching.down) this.player.body.velocity.y = -gameOptions.playerGravity / 1.6;
         if (this.cursors.space.isDown) this.player.body.velocity.y = -gameOptions.playerGravity / 1.6;
         if (this.player.y > gameHeight) {
+            backgroundMusic.stop();
             this.scene.start("LevelScene3");
             this.score = 0;
         }
         if (this.player.x > gameWidth || this.player.x < 0) {
             this.player.x = gameWidth / 5.5;
             this.player.y = gameHeight / 1.25;
+        }
+        if (this.score >= 150) {
+            this.info.setText("You have 30 seconds to collect extra points!");
+            this.timeTrigger = this.time.addEvent({
+                callback: this.finishLevel,
+                callbackScope: this,
+                delay: 30000,
+                loop: true
+            });
         }
     }
 }

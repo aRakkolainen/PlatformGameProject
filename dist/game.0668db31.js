@@ -589,9 +589,9 @@ let backgroundMusic;
 class FinishScene extends (0, _phaserDefault.default).Scene {
     constructor(){
         super("FinishScene");
-    //this.score=0;
     }
     preload() {
+        //Sound effects are downloaded from here: https://freesfx.co.uk/Default.aspx 
         this.load.audio("background4", "./assets/background4.mp3");
     }
     create(gameData) {
@@ -696,6 +696,9 @@ class FinishScene extends (0, _phaserDefault.default).Scene {
     }
     update() {
         if (this.cursors.space.isDown) {
+            // Emptying the lists: https://stackoverflow.com/questions/1232040/how-do-i-empty-an-array-in-javascript 
+            while(this.data.playerData.totalScore.length > 0)this.data.playerData.totalScore.pop();
+            while(this.data.playerData.enemiesKilled.length > 0)this.data.playerData.enemiesKilled.pop();
             backgroundMusic.stop();
             this.scene.start("BootScene");
         }

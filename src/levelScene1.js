@@ -6,10 +6,9 @@
 // Switching between scenes: https://www.thepolyglotdeveloper.com/2020/09/switch-between-scenes-phaser-game/
 // Multiple scenes in Phaser: https://flaviocopes.com/phaser-multiple-scenes/
 // Adding sound effects to the game: https://www.thepolyglotdeveloper.com/2020/09/add-music-sounds-other-audio-phaser-game/ 
-// All sounc effects in this project are from this website: https://freesfx.co.uk/Default.aspx 
+// All sound effects in this project are from this website: https://freesfx.co.uk/Default.aspx 
 // + Phaser 3 Documentation: https://photonstorm.github.io/phaser3-docs/index.html
 // + Course material
-//import cactusPlatform from "./assets/cactusWithPlatform.png";
 
 //import "./styles.css";
 //let game; 
@@ -24,16 +23,15 @@ let enemiesKillScore;
 let gunShot; 
 let blingSound; 
 let backgroundMusic;  
-
 export default class LevelScene1 extends Phaser.Scene { 
   constructor() {
     super("LevelScene1");
     this.score=0;
     this.enemyMoving=false; 
     this.enemiesKilledScore = 0; 
+    this.info; 
   }
   preload() {
-    //this.load.background("background", "assets/background.png");
     this.load.image("platform", "./assets/sandplatform.png");
     this.load.image("small_platform", "./assets/smallsand_platform.png");
     this.load.image("popsicle1", "./assets/popsicle1.png");
@@ -47,7 +45,7 @@ export default class LevelScene1 extends Phaser.Scene {
     this.load.image("arrows", "./assets/arrows.png");
     this.load.image("spaceBar", "./assets/spaceBar.png");
     this.load.image("shootkeys", "./assets/shootkeys.png");
-    this.load.image("test", "./assets/test.png")
+    //Sound effects are downloaded from here: https://freesfx.co.uk/Default.aspx 
     this.load.audio("gunShot", "./assets/gunShot.mp3");
     this.load.audio("bling", "./assets/bling.mp3");
     this.load.audio("background1", "./assets/background.mp3");
@@ -61,7 +59,7 @@ export default class LevelScene1 extends Phaser.Scene {
   
   }
   create(gameData) {
-    //Sound effects: 
+    //Sound effects: Based on this website: https://www.thepolyglotdeveloper.com/2020/09/add-music-sounds-other-audio-phaser-game/ 
     blingSound = this.sound.add("bling", {loop: false});
     gunShot = this.sound.add("gunShot", {loop: false});
     backgroundMusic = this.sound.add("background1", {loop: true});
@@ -69,11 +67,11 @@ export default class LevelScene1 extends Phaser.Scene {
     let div = document.getElementById("gameContainer"); 
     // Background
     div.style.background = "linear-gradient(#113388, #114488, #553388, #594488, #773388, #993388,#652244, #673346)";
-    //Hiding the usernameInput
+    //Hiding the usernameInput so it doesn't have impact while playing
     // Source: https://www.geeksforgeeks.org/hide-or-show-elements-in-html-using-display-property/
     let usernameInput = document.getElementById("input-form"); 
     usernameInput.style.display = "none";
-    // Data from start scene: 
+    // Data from startScene: 
     this.data = gameData;
     player = gameData.playerData; 
     gameScore = player.totalScore; 
@@ -101,36 +99,34 @@ export default class LevelScene1 extends Phaser.Scene {
       immovable: true, 
       allowGravity: false
     })
-    //Fire balls: 
+    //Fire balls: Source: https://phasergames.com/phaser-3-physics-beginners/
     this.fireBalls = this.physics.add.group(
       {defaultKey: 'fireball', 
     maxSize: 50, }
     );
 
-  
+    //Setting up the platforms for start and end
     this.startplatform = this.physics.add.staticSprite(gameWidth/2, gameHeight/(1/0.87), "platform");
     this.endPlatform = this.physics.add.staticSprite(gameWidth-100, gameHeight-850, "platform");
     this.finish = this.physics.add.staticSprite(gameWidth-75, gameHeight-885, "finish_line");
-  
+    //Placing all platforms and enemies
     let platformNum = Phaser.Math.Between(3, 15);
     let smallPlatformNum = Phaser.Math.Between(3, 20);
     for(let i = 0; i < platformNum; i++) {
-      this.platformGroup.create(Phaser.Math.Between(30, gameWidth), Phaser.Math.Between(210, gameHeight), "platform");
+      this.platformGroup.create(Phaser.Math.Between(0, gameWidth), Phaser.Math.Between(gameHeight-800, gameHeight), "platform");
   }
-  //this.cactus.create(Phaser.Math.Between(30, game.config.width), Phaser.Math.Between(210, game.config.height), "cactus")
   let cactusPlatformNum = Phaser.Math.Between(0, 15);
   let cactusNum = Phaser.Math.Between(5, 10);
   for (let i=0; i< cactusPlatformNum; i++) {
-    this.cactusPlatformGroup.create(Phaser.Math.Between(30, gameWidth), Phaser.Math.Between(210, gameHeight), "cactusPlatform")
+    this.cactusPlatformGroup.create(Phaser.Math.Between(0, gameWidth), Phaser.Math.Between(gameHeight-800, gameHeight), "cactusPlatform")
   }
   for (let i=0; i < cactusNum; i++) {
-    this.cactusGroup.create(Phaser.Math.Between(30, gameWidth), Phaser.Math.Between(210, gameHeight), "cactus");
+    this.cactusGroup.create(Phaser.Math.Between(0, gameWidth), Phaser.Math.Between(gameHeight-800, gameHeight), "cactus");
   }
     for(let i = 0; i < smallPlatformNum; i++) {
-    this.smallPlatformGroup.create(Phaser.Math.Between(210, gameWidth), Phaser.Math.Between(180, gameHeight), "small_platform");
+    this.smallPlatformGroup.create(Phaser.Math.Between(0, gameWidth), Phaser.Math.Between(gameHeight-800, gameHeight), "small_platform");
 }
-
-    //this.physics.add.overlap(this.startplatform, this.platformGroup)
+    //Adding the player and setting the colliders with other elements
     this.player = this.physics.add.sprite(gameWidth/2, gameHeight/(1/0.80), "player")
     this.player.body.gravity.y = gameOptions.playerGravity;
     this.physics.add.collider(this.player, this.platformGroup);
@@ -142,7 +138,7 @@ export default class LevelScene1 extends Phaser.Scene {
     this.physics.add.collider(this.player, this.finish, this.finishLevel, null, this);
     this.physics.add.collider(this.player, this.endPlatform);
 
-
+    //Adding things to collect: 
     this.yellowPopsicleGroup = this.physics.add.group({})
     this.pinkPopsicleGroup = this.physics.add.group({})
     this.whitePopsicleGroup = this.physics.add.group({})
@@ -162,19 +158,19 @@ export default class LevelScene1 extends Phaser.Scene {
     let whiteNum = Phaser.Math.Between(3, 6); 
     let blueNum = Phaser.Math.Between(1, 2);    
     for (let i=0; i < yellowNum; i++) {
-      this.yellowPopsicleGroup.create(Phaser.Math.Between(30, gameWidth), Phaser.Math.Between(210, gameHeight), "popsicle1")
+      this.yellowPopsicleGroup.create(Phaser.Math.Between(0, gameWidth), Phaser.Math.Between(gameHeight-800, gameHeight), "popsicle1")
     }
 
     for (let i=0; i < pinkNum; i++) {
-      this.pinkPopsicleGroup.create(Phaser.Math.Between(30, gameWidth), Phaser.Math.Between(210, gameHeight), "popsicle2")
+      this.pinkPopsicleGroup.create(Phaser.Math.Between(0, gameWidth), Phaser.Math.Between(gameHeight-800, gameHeight), "popsicle2")
     }
 
     for (let i=0; i < whiteNum; i++) {
-      this.whitePopsicleGroup.create(Phaser.Math.Between(30, gameWidth), Phaser.Math.Between(210, gameHeight), "popsicle3")
+      this.whitePopsicleGroup.create(Phaser.Math.Between(0, gameWidth), Phaser.Math.Between(gameHeight-800, gameHeight), "popsicle3")
     }
 
     for (let i = 0; i < blueNum; i++) {
-      this.bluePopsicleGroup.create(Phaser.Math.Between(30, gameWidth), Phaser.Math.Between(210, gameHeight), "popsicle4")
+      this.bluePopsicleGroup.create(Phaser.Math.Between(0, gameWidth), Phaser.Math.Between(gameHeight-800, gameHeight), "popsicle4")
     }
     //Adding the score board and points
     this.text = this.add.text(gameWidth-775, gameHeight-995, "SCORE: ", {fontSize:"25px", fill: "#ffffff", fontStyle:"bold"})
@@ -195,7 +191,7 @@ export default class LevelScene1 extends Phaser.Scene {
     this.jump = this.add.text(gameWidth-525, gameHeight-910, "Jump higher", {fontSize:"18px", fill: "#ffffff"});
     this.add.text(gameWidth-525, gameHeight-870, "Shoot", {fontSize:"18px", fill: "#ffffff"});
     this.shoot = this.add.image(gameWidth-570, gameHeight-860, "shootkeys");
-    this.info = this.add.text(gameWidth-470, gameHeight-995, "Collect at least 50 points to succeed!", {fontSize:"20px", fill: "#ffffff", fontStyle:"bold"})
+    this.info = this.add.text(gameWidth-450, gameHeight*0.005, "Collect at least 50 points to succeed!", {fontSize:"15px", fill: "#ffffff", fontStyle:"bold"})
     // overlaps for collecting items and interacting with enemies
     this.physics.add.overlap(this.player, this.yellowPopsicleGroup, this.collectYellowPopsicle, null, this)
     this.physics.add.overlap(this.player, this.pinkPopsicleGroup, this.collectPinkPopsicle, null, this)
@@ -230,7 +226,6 @@ export default class LevelScene1 extends Phaser.Scene {
     })
     this.anims.create({
       key: "shootLeft", 
-      //frames: [{key: "player", frame: 0}],
       frames: this.anims.generateFrameNumbers("player", {start: 3, end: 0}),
       frameRate: 10,
     })
@@ -303,15 +298,20 @@ export default class LevelScene1 extends Phaser.Scene {
         name: "Level1", 
         score: this.score
       }
+      this.enemyKills = {
+        name: "cactus", 
+        number: this.enemiesKilledScore
+      }
+      enemiesKillScore.push(this.enemyKills);
       gameScore.push(this.totalScore);
-      enemiesKillScore[0].number = this.enemiesKilledScore;
       backgroundMusic.stop();
+      this.score=0; 
       this.scene.start("LevelScene2", this.data, this.playerData);
 
     }
   }
   
-  //Based on this: https://phasergames.com/phaser-3-physics-beginners/ 
+  //Both shooting functions are based on this: https://phasergames.com/phaser-3-physics-beginners/ 
   shootLeft(player) {
     let fireBall = this.fireBalls.get(this.player.x, this.player.y);
     if (fireBall) {
@@ -377,7 +377,7 @@ export default class LevelScene1 extends Phaser.Scene {
       this.shootRight();
       this.player.anims.play("shootRight", true)
     }
-    // Based on this website: https://phasergames.com/phaser-3-physics-beginners/
+    // Reloading fireBalls is based on this website: https://phasergames.com/phaser-3-physics-beginners/
     this.fireBalls.children.each(function(b) {
       if (b.active) {
         b.setActive(true);
@@ -396,23 +396,29 @@ export default class LevelScene1 extends Phaser.Scene {
       this.player.body.velocity.y = -gameOptions.playerGravity/1.6; 
     }
     if (this.player.y > gameHeight ) {
+      backgroundMusic.stop(); 
       this.scene.start("LevelScene1");
       this.score=0;
     }
-    //this.physics.add.overlap(this.player, this.finish, this.finishLevel, null, this)
     if (this.player.x > gameWidth || this.player.x < 0) {
       this.player.x = gameWidth/2;
       this.player.y = gameHeight/(1/0.80);
     }
 
-    /*if (this.score >= 50) {
-      gameScore[0].score = this.score; 
-      this.scene.start("LevelScene2", this.data);
-    }*/
+
+
+    if (this.score >= 50) {
+      this.info.setText("You have 30 seconds to collect extra points!"); 
+      this.timeTrigger = this.time.addEvent({
+        callback: this.finishLevel, 
+        callbackScope: this, 
+        delay: 30000, 
+        loop: true
+      })
+      
+    }
 
   }
 
 
 };
-
-//import "./styles.css";

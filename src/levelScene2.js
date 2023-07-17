@@ -15,7 +15,8 @@ export default class LevelScene2 extends Phaser.Scene {
       super("LevelScene2");
       this.score=0;
       this.enemyMoving=false;
-      this.enemiesKilledScore = 0; 
+      this.enemiesKilledScore = 0;
+      this.info; 
     }
     preload() {
       // Loading the player
@@ -33,6 +34,7 @@ export default class LevelScene2 extends Phaser.Scene {
       this.load.image("diamond", "./assets/diamond.png");
       this.load.image("stonemonster", "./assets/stonemonster.png");
       this.load.image("finish_line", "./assets/finish.png");
+       //Sound effects are downloaded from here: https://freesfx.co.uk/Default.aspx 
       this.load.audio("gunShot", "./assets/gunShot.mp3");
       this.load.audio("bling", "./assets/bling.mp3");
       this.load.audio("background2", "./assets/background2.mp3");
@@ -47,12 +49,12 @@ export default class LevelScene2 extends Phaser.Scene {
       this.data = gameData;
       player = gameData.playerData; 
       gameScore = player.totalScore; 
-      console.log(player);
       enemiesKillScore = player.enemiesKilled;
       gameConfig =  gameData.config;
       gameWidth = gameConfig.scale.width; 
       gameHeight = gameConfig.scale.height; 
       gameOptions = gameData.options;
+      //Sound effects are added based on this website: https://www.thepolyglotdeveloper.com/2020/09/add-music-sounds-other-audio-phaser-game/ 
       blingSound = this.sound.add("bling", {loop: false});
       gunShot = this.sound.add("gunShot", {loop: false});
       backgroundMusic = this.sound.add("background2", {loop: true});
@@ -63,26 +65,25 @@ export default class LevelScene2 extends Phaser.Scene {
       //Things to collect info + scores
       this.text = this.add.text(gameWidth-775, gameHeight-995, "SCORE: ", {fontSize:"25px", fill: "#ffffff", fontStyle:"bold"})
       const coal = this.physics.add.image(30, 60, "coal");
-      this.add.text(45, 50, "1 point ", {fontSize:"20px", fill: "#ffffff", fontStyle:"bold"})
-      this.add.text(45, 90, "3 points", {fontSize:"20px", fill: "#ffffff", fontStyle:"bold"})
+      this.add.text(gameWidth-755, gameHeight-950, "1 point ", {fontSize:"20px", fill: "#ffffff", fontStyle:"bold"})
+      this.add.text(gameWidth-755, gameHeight-910, "3 points", {fontSize:"20px", fill: "#ffffff", fontStyle:"bold"})
       const emerald = this.physics.add.image(30, 100, "emerald")
-      this.add.text(45, 140, "5 points", {fontSize:"20px", fill: "#ffffff", fontStyle:"bold"})
-      const topaz = this.physics.add.image(30, 140, "topaz")
-      this.blueText = this.add.text(45, 190, "10 points", {fontSize:"20px", fill: "#ffffff", fontStyle:"bold"})
-      const blueStone = this.physics.add.image(30, 200, "bluestone");
-      this.add.text(45, 240, "15 points", {fontSize:"20px", fill: "#ffffff", fontStyle:"bold"})
-      const diamond = this.physics.add.image(30, 240, "diamond");
-      this.scoreText = this.add.text(115, 5, "0", {fontSize:"25px", fill: "#0000000", fontStyle: "bold"})
+      this.add.text(gameWidth-755, gameHeight-860, "5 points", {fontSize:"20px", fill: "#ffffff", fontStyle:"bold"})
+      const topaz = this.physics.add.image(gameWidth-770, gameHeight-860, "topaz")
+      this.blueText = this.add.text(gameWidth-755, gameHeight-810, "10 points", {fontSize:"20px", fill: "#ffffff", fontStyle:"bold"})
+      const blueStone = this.physics.add.image(gameWidth-770, gameHeight-800, "bluestone");
+      this.add.text(gameWidth-755, gameHeight-760, "15 points", {fontSize:"20px", fill: "#ffffff", fontStyle:"bold"})
+      const diamond = this.physics.add.image(gameWidth-770, gameHeight-760, "diamond");
+      this.scoreText = this.add.text(gameWidth-685, gameHeight-995, "0", {fontSize:"25px", fill: "#0000000", fontStyle: "bold"})
       //How to play instructions: 
-      //How to play instructions: 
-      this.keys = this.add.text(195, 5, "KEYS: ", {fontSize:"25px", fill: "#ffffff", fontStyle:"bold"})
-      this.add.image(230, 55, "arrows");
-      this.move = this.add.text(275, 55, "Move", {fontSize:"18px", fill: "#ffffff"});
-      this.spaceBar = this.add.image(230, 100, "spaceBar");
-      this.jump = this.add.text(275, 90, "Jump higher", {fontSize:"18px", fill: "#ffffff"});
-      this.add.text(275, 130, "Shoot", {fontSize:"18px", fill: "#ffffff"});
-      this.shoot = this.add.image(230, 140, "shootkeys");
-      this.info = this.add.text(gameWidth-420, 5, "Collect at least 100 points to pass the level!", {fontSize:"20px", fill: "#ffffff", fontStyle:"bold"})
+      this.keys = this.add.text(gameWidth-605, gameHeight-995, "KEYS: ", {fontSize:"25px", fill: "#ffffff", fontStyle:"bold"})
+      this.add.image(gameWidth-570, gameHeight-945, "arrows");
+      this.move = this.add.text(gameWidth-525, gameHeight-945, "Move", {fontSize:"18px", fill: "#ffffff"});
+      this.spaceBar = this.add.image(gameWidth-570, gameHeight-900, "spaceBar");
+      this.jump = this.add.text(gameWidth-525, gameHeight-910, "Jump higher", {fontSize:"18px", fill: "#ffffff"});
+      this.add.text(gameWidth-525, gameHeight-870, "Shoot", {fontSize:"18px", fill: "#ffffff"});
+      this.shoot = this.add.image(gameWidth-570, gameHeight-860, "shootkeys");
+      this.info = this.add.text(gameWidth-450, gameHeight*0.005, "Collect at least 100 points to succeed!", {fontSize:"15px", fill: "#ffffff", fontStyle:"bold"})
 
       // Platforms: 
       this.platformGroup = this.physics.add.group({
@@ -101,7 +102,7 @@ export default class LevelScene2 extends Phaser.Scene {
       allowGravity: false
     })
 
-    //Fire balls: 
+    //Fire balls: Source: https://phasergames.com/phaser-3-physics-beginners/
     this.fireBalls = this.physics.add.group(
       {defaultKey: 'fireball', 
     maxSize: 50, }
@@ -111,7 +112,7 @@ export default class LevelScene2 extends Phaser.Scene {
       immovable: false, 
       allowGravity: false
     })
-    // Collectibles: 
+    // Collectables: 
 
     this.topazGroup = this.physics.add.group({})
     this.emeraldGroup = this.physics.add.group({})
@@ -124,23 +125,23 @@ export default class LevelScene2 extends Phaser.Scene {
     let bluestoneNum = Phaser.Math.Between(3, 6);
     let diamondNum = Phaser.Math.Between(2, 4);
     for (let i=0; i < coalNum; i++) {
-      this.coalGroup.create(Phaser.Math.Between(30, gameWidth), Phaser.Math.Between(210, gameHeight), "coal")
+      this.coalGroup.create(Phaser.Math.Between(0, gameWidth), Phaser.Math.Between(gameHeight-760, gameHeight), "coal")
     }
 
     for (let i=0; i < emeraldNum; i++) {
-      this.emeraldGroup.create(Phaser.Math.Between(30, gameWidth), Phaser.Math.Between(210, gameHeight), "emerald")
+      this.emeraldGroup.create(Phaser.Math.Between(0, gameWidth), Phaser.Math.Between(gameHeight-760, gameHeight), "emerald")
     }
 
     for (let i=0; i < topazNum; i++) {
-      this.topazGroup.create(Phaser.Math.Between(30, gameWidth), Phaser.Math.Between(210, gameHeight), "topaz")
+      this.topazGroup.create(Phaser.Math.Between(0, gameWidth), Phaser.Math.Between(gameHeight-760, gameHeight), "topaz")
     }
 
     for (let i=0; i < bluestoneNum; i++) {
-      this.bluestoneGroup.create(Phaser.Math.Between(30, gameWidth), Phaser.Math.Between(210, gameHeight), "bluestone")
+      this.bluestoneGroup.create(Phaser.Math.Between(0, gameWidth), Phaser.Math.Between(gameHeight-760, gameHeight), "bluestone")
     }
 
     for (let i=0; i < diamondNum; i++) {
-      this.diamondGroup.create(Phaser.Math.Between(30, gameWidth), Phaser.Math.Between(210, gameHeight), "diamond")
+      this.diamondGroup.create(Phaser.Math.Between(0, gameWidth), Phaser.Math.Between(gameHeight-760, gameHeight), "diamond")
     }
 
 
@@ -154,19 +155,19 @@ export default class LevelScene2 extends Phaser.Scene {
     let skeletonPlatformNum = Phaser.Math.Between(3, 15);
     let stonemonsterNum = Phaser.Math.Between(5, 10);
     for(let i = 0; i < platformNum; i++) {
-      this.platformGroup.create(Phaser.Math.Between(30, gameWidth), Phaser.Math.Between(210, gameHeight), "mountainplatform");
-      this.stonemonsterGroup.create(Phaser.Math.Between(30, gameWidth), Phaser.Math.Between(210, gameHeight), "stonemonster")
+      this.platformGroup.create(Phaser.Math.Between(30, gameWidth), Phaser.Math.Between(gameHeight-760, gameHeight), "mountainplatform");
+      this.stonemonsterGroup.create(Phaser.Math.Between(30, gameWidth), Phaser.Math.Between(gameHeight-760, gameHeight), "stonemonster")
     }
     for (let i=0; i < stonemonsterNum; i++) {
-      this.stonemonsterGroup.create(Phaser.Math.Between(30, gameWidth), Phaser.Math.Between(210, gameHeight), "stonemonster");
+      this.stonemonsterGroup.create(Phaser.Math.Between(30, gameWidth), Phaser.Math.Between(gameHeight-760, gameHeight), "stonemonster");
     }
     
     for(let i = 0; i < smallPlatformNum; i++) {
-      this.smallPlatformGroup.create(Phaser.Math.Between(210, gameWidth), Phaser.Math.Between(180, gameHeight), "mountainsmallPlatform");
+      this.smallPlatformGroup.create(Phaser.Math.Between(210, gameWidth), Phaser.Math.Between(gameHeight-760, gameHeight), "mountainsmallPlatform");
     }
 
     for (let i= 0; i < skeletonPlatformNum; i++) {
-      this.skeletonPlatformGroup.create(Phaser.Math.Between(210, gameWidth), Phaser.Math.Between(180, gameHeight), "mountainsmallSkeletonPlatform");
+      this.skeletonPlatformGroup.create(Phaser.Math.Between(210, gameWidth), Phaser.Math.Between(gameHeight-760, gameHeight), "mountainsmallSkeletonPlatform");
     }
 
     this.player = this.physics.add.sprite(gameWidth/5.5, gameHeight/(1/0.80), "player")
@@ -237,7 +238,7 @@ export default class LevelScene2 extends Phaser.Scene {
       this.score += 15;  
       this.scoreText.setText(this.score)
     }
-    //Based on this: https://phasergames.com/phaser-3-physics-beginners/ 
+    //Shooting functions are based on this: https://phasergames.com/phaser-3-physics-beginners/ 
     shootLeft(player) {
       let fireBall = this.fireBalls.get(this.player.x, this.player.y);
       if (fireBall) {
@@ -291,13 +292,18 @@ export default class LevelScene2 extends Phaser.Scene {
           blingSound.play();
           this.player.body.velocity.x = 0; 
           this.player.body.velocity.y = 0; 
-          enemiesKillScore[1].number = this.enemiesKilledScore; 
           this.totalScore = {
             name: "Level2", 
             score: this.score
           }
+          this.enemyKills = {
+            name: "stonemonster", 
+            number: this.enemiesKilledScore
+          }
+          enemiesKillScore.push(this.enemyKills);
           gameScore.push(this.totalScore);
           backgroundMusic.stop();
+          this.score = 0; 
           this.scene.start("LevelScene3", this.data);
   
       }
@@ -358,6 +364,7 @@ export default class LevelScene2 extends Phaser.Scene {
       this.player.body.velocity.y = -gameOptions.playerGravity/1.6; 
     }
     if (this.player.y > gameHeight ) {
+      backgroundMusic.stop();
       this.scene.start("LevelScene2");
       this.score=0;
     }
@@ -366,5 +373,17 @@ export default class LevelScene2 extends Phaser.Scene {
       this.player.x = gameWidth/5.5;
       this.player.y = gameHeight/(1/0.80);
     }
+
+    if (this.score >= 100) {
+      this.info.setText("You have 30 seconds to collect extra points!"); 
+      this.timeTrigger = this.time.addEvent({
+        callback: this.finishLevel, 
+        callbackScope: this, 
+        delay: 30000, 
+        loop: true
+      })
+      
     }
+    }
+    
 }
