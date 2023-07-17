@@ -581,6 +581,8 @@ function hmrAccept(bundle /*: ParcelRequire */ , id /*: string */ ) {
 // Shooting fire balls as bullets: https://phasergames.com/phaser-3-physics-beginners/
 // Switching between scenes: https://www.thepolyglotdeveloper.com/2020/09/switch-between-scenes-phaser-game/
 // Multiple scenes in Phaser: https://flaviocopes.com/phaser-multiple-scenes/
+// Adding sound effects to the game: https://www.thepolyglotdeveloper.com/2020/09/add-music-sounds-other-audio-phaser-game/ 
+// All sounc effects in this project are from this website: https://freesfx.co.uk/Default.aspx 
 // + Phaser 3 Documentation: https://photonstorm.github.io/phaser3-docs/index.html
 // + Course material
 //import cactusPlatform from "./assets/cactusWithPlatform.png";
@@ -590,17 +592,22 @@ var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
 parcelHelpers.defineInteropFlag(exports);
 var _phaser = require("phaser");
 var _phaserDefault = parcelHelpers.interopDefault(_phaser);
-let data;
 let gameConfig;
 let gameOptions;
 let gameWidth;
 let gameHeight;
+let player;
 let gameScore;
+let enemiesKillScore;
+let gunShot;
+let blingSound;
+let backgroundMusic;
 class LevelScene1 extends (0, _phaserDefault.default).Scene {
     constructor(){
         super("LevelScene1");
         this.score = 0;
         this.enemyMoving = false;
+        this.enemiesKilledScore = 0;
     }
     preload() {
         //this.load.background("background", "assets/background.png");
@@ -618,16 +625,38 @@ class LevelScene1 extends (0, _phaserDefault.default).Scene {
         this.load.image("spaceBar", "./assets/spaceBar.png");
         this.load.image("shootkeys", "./assets/shootkeys.png");
         this.load.image("test", "./assets/test.png");
+        this.load.audio("gunShot", "./assets/gunShot.mp3");
+        this.load.audio("bling", "./assets/bling.mp3");
+        this.load.audio("background1", "./assets/background.mp3");
         this.load.spritesheet("player", "./assets/player.png", {
             frameWidth: 32,
             frameHeight: 48
         });
     }
     create(gameData) {
+        //Sound effects: 
+        blingSound = this.sound.add("bling", {
+            loop: false
+        });
+        gunShot = this.sound.add("gunShot", {
+            loop: false
+        });
+        backgroundMusic = this.sound.add("background1", {
+            loop: true
+        });
+        backgroundMusic.play();
         let div = document.getElementById("gameContainer");
+        // Background
         div.style.background = "linear-gradient(#113388, #114488, #553388, #594488, #773388, #993388,#652244, #673346)";
+        //Hiding the usernameInput
+        // Source: https://www.geeksforgeeks.org/hide-or-show-elements-in-html-using-display-property/
+        let usernameInput = document.getElementById("input-form");
+        usernameInput.style.display = "none";
+        // Data from start scene: 
         this.data = gameData;
-        gameScore = gameData.totalScore;
+        player = gameData.playerData;
+        gameScore = player.totalScore;
+        enemiesKillScore = player.enemiesKilled;
         gameConfig = gameData.config;
         gameWidth = gameConfig.scale.width;
         gameHeight = gameConfig.scale.height;
@@ -822,21 +851,25 @@ class LevelScene1 extends (0, _phaserDefault.default).Scene {
     }
     collectYellowPopsicle(player, start) {
         start.disableBody(true, true);
+        blingSound.play();
         this.score += 1;
         this.scoreText.setText(this.score);
     }
     collectPinkPopsicle(player, start) {
         start.disableBody(true, true);
+        blingSound.play();
         this.score += 3;
         this.scoreText.setText(this.score);
     }
     collectWhitePopsicle(player, start) {
         start.disableBody(true, true);
+        blingSound.play();
         this.score += 5;
         this.scoreText.setText(this.score);
     }
     collectBluePopsicle(player, start) {
         start.disableBody(true, true);
+        blingSound.play();
         this.score += 10;
         this.scoreText.setText(this.score);
     }
@@ -853,22 +886,31 @@ class LevelScene1 extends (0, _phaserDefault.default).Scene {
     cactusKill(player, start) {
         start.disableBody(true, true);
         this.score += 5;
+        this.enemiesKilledScore += 1;
         this.scoreText.setText(this.score);
     }
     finishLevel() {
         if (this.score < 50) this.info.setText("Collect more points");
         else if (this.score >= 50) {
             this.info.setText("You won!");
+            blingSound.play();
             this.player.body.velocity.x = 0;
             this.player.body.velocity.y = 0;
-            gameScore[0].score = this.score;
-            this.scene.start("LevelScene2", this.data);
+            this.totalScore = {
+                name: "Level1",
+                score: this.score
+            };
+            gameScore.push(this.totalScore);
+            enemiesKillScore[0].number = this.enemiesKilledScore;
+            backgroundMusic.stop();
+            this.scene.start("LevelScene2", this.data, this.playerData);
         }
     }
     //Based on this: https://phasergames.com/phaser-3-physics-beginners/ 
     shootLeft(player) {
         let fireBall = this.fireBalls.get(this.player.x, this.player.y);
         if (fireBall) {
+            gunShot.play();
             fireBall.setActive(true);
             fireBall.setVisible(true);
             fireBall.body.velocity.x = -200;
@@ -877,6 +919,7 @@ class LevelScene1 extends (0, _phaserDefault.default).Scene {
     shootRight(player) {
         let fireBall = this.fireBalls.get(this.player.x, this.player.y);
         if (fireBall) {
+            gunShot.play();
             fireBall.setActive(true);
             fireBall.setVisible(true);
             fireBall.body.velocity.x = 200;

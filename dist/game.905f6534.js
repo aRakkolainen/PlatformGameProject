@@ -652,27 +652,31 @@ class BootScene extends (0, _phaserDefault.default).Scene {
         this.data = {
             config: phaserConfig,
             options: gameOptions,
-            totalScore: [
-                {
-                    name: "level1",
-                    score: 0
-                },
-                {
-                    name: "level2",
-                    score: 0
-                },
-                {
-                    name: "level3",
-                    score: 0
-                }
-            ],
-            playerName: ""
+            playerData: {
+                name: "",
+                totalScore: [],
+                enemiesKilled: [
+                    {
+                        name: "cactus",
+                        number: 0
+                    },
+                    {
+                        name: "stonemonster",
+                        number: 0
+                    },
+                    {
+                        name: "alien",
+                        number: 0
+                    }
+                ]
+            }
         };
         this.scene.start("StartScene", this.data);
     }
 }
 
 },{"./src/startScene":"loePq","./src/levelScene1":"4cF2E","./src/levelScene2":"fNmku","./src/levelScene3":"ccm34","./src/finishScene":"5rk9W","phaser3-rex-plugins/templates/ui/ui-plugin":"kCKu7","./src/styles.css":"lW6qc","phaser":"d1pJ3","@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3"}],"ccm34":[function(require,module,exports) {
+//Sources: Course material + same sources as in previous levels
 var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
 parcelHelpers.defineInteropFlag(exports);
 var _phaser = require("phaser");
@@ -681,16 +685,22 @@ var _moonplatformPng = require("./assets/moonplatform.png");
 var _moonplatformPngDefault = parcelHelpers.interopDefault(_moonplatformPng);
 var _smallmoonPlatformPng = require("./assets/smallmoon_platform.png");
 var _smallmoonPlatformPngDefault = parcelHelpers.interopDefault(_smallmoonPlatformPng);
-let gameData;
+let playerData;
+let data;
+let enemiesKillScore;
 let gameConfig;
 let gameOptions;
 let gameWidth;
 let gameHeight;
 let gameScore;
+let gunShot;
+let blingSound;
+let backgroundMusic;
 class LevelScene3 extends (0, _phaserDefault.default).Scene {
     constructor(){
         super("LevelScene3");
         this.score = 0;
+        this.enemiesKilledScore = 0;
     }
     preload() {
         this.load.image("moonplatform", (0, _moonplatformPngDefault.default));
@@ -707,6 +717,10 @@ class LevelScene3 extends (0, _phaserDefault.default).Scene {
         this.load.image("star2", "./assets/star2.png");
         this.load.image("star3", "./assets/star3.png");
         this.load.image("star4", "./assets/star4.png");
+        this.load.audio("gunShot", "./assets/gunShot.mp3");
+        this.load.audio("hit", "./assets/hit.mp3");
+        this.load.audio("bling", "./assets/bling.mp3");
+        this.load.audio("background3", "./assets/background3.mp3");
         this.load.image("shootkeys", "./assets/shootkeys.png");
         // Loading the player
         this.load.spritesheet("player", "./assets/player.png", {
@@ -716,16 +730,26 @@ class LevelScene3 extends (0, _phaserDefault.default).Scene {
     }
     create(gameData) {
         this.data = gameData;
+        data = gameData;
+        playerData = gameData.playerData;
+        gameScore = playerData.totalScore;
+        enemiesKillScore = playerData.enemiesKilled;
         gameConfig = gameData.config;
         gameWidth = gameConfig.scale.width;
         gameHeight = gameConfig.scale.height;
         gameOptions = gameData.options;
         gameScore = gameData.totalScore;
-        //This is based on this website: https://www.html5gamedevs.com/topic/42460-how-to-stretch-background-image-on-full-screen/
-        //const windowWidth = window.innerWidth; 
-        //const windowHeight = window.innerHeight;
-        //this.background = this.add.image(windowWidth / 2, windowHeight / 2, "background")
-        //this.background.setDisplaySize(windowWidth, windowHeight);
+        // Sound effects: 
+        blingSound = this.sound.add("bling", {
+            loop: false
+        });
+        gunShot = this.sound.add("gunShot", {
+            loop: false
+        });
+        backgroundMusic = this.sound.add("background3", {
+            loop: true
+        });
+        backgroundMusic.play();
         let div = document.getElementById("gameContainer");
         div.style.background = "linear-gradient(#0a0529, #180a5f, #170766, #450181,  #410377, #2b0050, #160129)";
         // Things to collet information: 
@@ -784,7 +808,7 @@ class LevelScene3 extends (0, _phaserDefault.default).Scene {
             fill: "#ffffff"
         });
         this.shoot = this.add.image(gameWidth - 570, gameHeight - 860, "shootkeys");
-        this.info = this.add.text(gameWidth - 470, gameHeight - 995, "Collect at least 50 points to succeed!", {
+        this.info = this.add.text(gameWidth - 470, gameHeight - 995, "Collect at least 150 points to succeed!", {
             fontSize: "20px",
             fill: "#ffffff",
             fontStyle: "bold"
@@ -804,7 +828,8 @@ class LevelScene3 extends (0, _phaserDefault.default).Scene {
             allowGravity: false
         });
         this.alienGroup = this.physics.add.group({
-            immovable: false,
+            defaultKey: "alien",
+            maxSize: 25,
             allowGravity: true
         });
         //Fire balls: 
@@ -821,13 +846,9 @@ class LevelScene3 extends (0, _phaserDefault.default).Scene {
         for(let i = 0; i < smallPlatformNum; i++)this.smallPlatformGroup.create((0, _phaserDefault.default).Math.Between(210, gameWidth), (0, _phaserDefault.default).Math.Between(180, gameHeight), "smallmoonPlatform");
         for(let i = 0; i < smallPlatformNum; i++)this.moonplatformGroup.create((0, _phaserDefault.default).Math.Between(210, gameWidth), (0, _phaserDefault.default).Math.Between(180, gameHeight), "smallmoonPlatform");
         for(let i = 0; i < smallPlatformNum; i++)this.moonplatformGroup.create((0, _phaserDefault.default).Math.Between(210, gameWidth), (0, _phaserDefault.default).Math.Between(180, gameHeight), "smallmoonPlatform");
-        let alienNum = (0, _phaserDefault.default).Math.Between(10, 15);
-        /*for(let i = 0; i < alienNum; i++) {
-      this.alien = this.add.spritesheet(Phaser.Math.Between(210, gameWidth), Phaser.Math.Between(180, gameHeight), "alien")
-      //this.alienGroup.create(Phaser.Math.Between(210, gameWidth), Phaser.Math.Between(180, gameHeight), "alien");
-      this.alien.setActive(true);
-      this.alien.setVelocityX(Phaser.Math.Between(-50, 50));
-      this.alien.setVelocityY(Phaser.Math.Between(-50, 50));
+        /*let alienNum = Phaser.Math.Between(10, 15);
+    for(let i = 0; i < alienNum; i++) {
+      this.alienGroup.create(Phaser.Math.Between(210, gameWidth), Phaser.Math.Between(180, gameHeight), "alien");
     }*/ this.player = this.physics.add.sprite(gameWidth / 5.5, gameHeight / 1.25, "player");
         this.player.body.gravity.y = gameOptions.playerGravity;
         this.physics.add.collider(this.player, this.startplatform);
@@ -836,6 +857,12 @@ class LevelScene3 extends (0, _phaserDefault.default).Scene {
         this.physics.add.collider(this.player, this.moonplatformGroup, this.movePlatform, null, this);
         this.physics.add.collider(this.player, this.finishLine, this.finishLevel, null, this);
         this.physics.add.collider(this.player, this.endPlatform);
+        this.physics.add.overlap(this.player, this.alienGroup, this.enemyAttack, null, this);
+        // Fireballs 
+        this.physics.add.collider(this.fireBalls, this.platformGroup, this.disappear, null, this);
+        this.physics.add.collider(this.fireBalls, this.smallPlatformGroup, this.disappear, null, this);
+        this.physics.add.collider(this.fireBalls, this.moonplatformGroup, this.disappear, null, this);
+        this.physics.add.overlap(this.fireBalls, this.alienGroup, this.enemyKill, null, this);
         // Things to collect: 
         let starNum = (0, _phaserDefault.default).Math.Between(5, 10);
         let starNum2 = (0, _phaserDefault.default).Math.Between(7, 14);
@@ -855,23 +882,41 @@ class LevelScene3 extends (0, _phaserDefault.default).Scene {
         this.physics.add.overlap(this.player, this.starGroup4, this.collectStar4, null, this);
         //this.physics.add.collider(this.player, this.skeletonPlatformGroup);
         this.cursors = this.input.keyboard.createCursorKeys();
+        this.timeTrigger = this.time.addEvent({
+            callback: this.makeEnemies,
+            callbackScope: this,
+            delay: 750,
+            loop: true
+        });
+    }
+    makeEnemies(player, start) {
+        let alien = this.alienGroup.get((0, _phaserDefault.default).Math.Between(30, gameWidth), (0, _phaserDefault.default).Math.Between(210, gameHeight));
+        if (alien) {
+            alien.setActive(true);
+            alien.setVelocityX((0, _phaserDefault.default).Math.Between(-50, 50));
+            alien.setVelocityY((0, _phaserDefault.default).Math.Between(-50, 50));
+        }
     }
     collectStar1(player, start) {
+        blingSound.play();
         start.disableBody(true, true);
         this.score += 3;
         this.scoreText.setText(this.score);
     }
     collectStar2(player, start) {
+        blingSound.play();
         start.disableBody(true, true);
         this.score += 5;
         this.scoreText.setText(this.score);
     }
     collectStar3(player, start) {
+        blingSound.play();
         start.disableBody(true, true);
         this.score += 15;
         this.scoreText.setText(this.score);
     }
     collectStar4(player, start) {
+        blingSound.play();
         start.disableBody(true, true);
         this.score += 20;
         this.scoreText.setText(this.score);
@@ -880,6 +925,7 @@ class LevelScene3 extends (0, _phaserDefault.default).Scene {
     shootLeft(player) {
         let fireBall = this.fireBalls.get(this.player.x, this.player.y);
         if (fireBall) {
+            gunShot.play();
             fireBall.setActive(true);
             fireBall.setVisible(true);
             fireBall.body.velocity.x = -200;
@@ -888,18 +934,46 @@ class LevelScene3 extends (0, _phaserDefault.default).Scene {
     shootRight(player) {
         let fireBall = this.fireBalls.get(this.player.x, this.player.y);
         if (fireBall) {
+            gunShot.play();
             fireBall.setActive(true);
             fireBall.setVisible(true);
             fireBall.body.velocity.x = 200;
         }
     }
-    finishLevel(player, start, gameData) {
+    enemyAttack(player, start) {
+        if (this.score > 0) {
+            this.score -= 15;
+            this.scoreText.setText(this.score);
+        }
+        start.body.velocity.y = (0, _phaserDefault.default).Math.Between(-100, 100);
+        start.body.velocity.x = (0, _phaserDefault.default).Math.Between(-100, 100);
+        this.enemyMoving = true;
+        this.player.x = gameWidth / 5.5;
+        this.player.y = gameHeight / 1.25;
+    }
+    enemyKill(player, start) {
+        start.disableBody(true, true);
+        this.score += 15;
+        this.enemiesKilledScore += 1;
+        this.scoreText.setText(this.score);
+    }
+    disappear(start) {
+        start.disableBody(false, true);
+    }
+    finishLevel(player, start, data) {
         if (this.score < 150) this.info.setText("Collect more points");
-        else if (this.score >= 1) {
+        else if (this.score >= 150) {
             this.info.setText("You won!");
+            blingSound.play();
             this.player.body.velocity.x = 0;
             this.player.body.velocity.y = 0;
-            gameScore[2].score = this.score;
+            enemiesKillScore[2].number = this.enemiesKilledScore;
+            this.total = {
+                name: "Level3",
+                score: this.score
+            };
+            this.data.playerData.totalScore.push(this.total);
+            backgroundMusic.stop();
             this.scene.start("FinishScene", this.data);
         }
     }
@@ -915,11 +989,11 @@ class LevelScene3 extends (0, _phaserDefault.default).Scene {
             this.player.anims.play("turn", true);
         }
         //Shooting options (First two are shooting while player is moving)
-        if (this.cursors.left.isDown) {
+        if (this.cursors.left.isDown && this.cursors.shift.isDown) {
             this.shootLeft();
             this.player.anims.play("shootLeft", true);
         }
-        if (this.cursors.right.isDown) {
+        if (this.cursors.right.isDown && this.cursors.shift.isDown) {
             this.shootRight();
             this.player.anims.play("shootRight", true);
         }
@@ -939,6 +1013,7 @@ class LevelScene3 extends (0, _phaserDefault.default).Scene {
         // Based on this website: https://phasergames.com/phaser-3-physics-beginners/
         this.fireBalls.children.each((function(b) {
             if (b.active) {
+                b.setActive(true);
                 if (b.x < 0 || b.x > gameWidth) b.setActive(false);
             }
         }).bind(this));
@@ -948,10 +1023,9 @@ class LevelScene3 extends (0, _phaserDefault.default).Scene {
             this.scene.start("LevelScene3");
             this.score = 0;
         }
-        //this.physics.add.overlap(this.player, this.finish, this.finishLevel, null, this)
         if (this.player.x > gameWidth || this.player.x < 0) {
-            this.player.x = this.startplatform.x;
-            this.player.y = this.startplatform.y;
+            this.player.x = gameWidth / 5.5;
+            this.player.y = gameHeight / 1.25;
         }
     }
 }
@@ -998,23 +1072,7 @@ exports.getOrigin = getOrigin;
 },{}],"8LWmS":[function(require,module,exports) {
 module.exports = require("7d3eee754efad779").getBundleURL("kLn1y") + "smallmoon_platform.ccf4245b.png" + "?" + Date.now();
 
-},{"7d3eee754efad779":"lgJ39"}],"5rk9W":[function(require,module,exports) {
-var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
-parcelHelpers.defineInteropFlag(exports);
-var _phaser = require("phaser");
-var _phaserDefault = parcelHelpers.interopDefault(_phaser);
-class FinishScene extends (0, _phaserDefault.default).Scene {
-    constructor(){
-        super("FinishScene");
-    //this.score=0;
-    }
-    preload() {}
-    create() {}
-    update() {}
-}
-exports.default = FinishScene;
-
-},{"phaser":"d1pJ3","@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3"}],"kCKu7":[function(require,module,exports) {
+},{"7d3eee754efad779":"lgJ39"}],"kCKu7":[function(require,module,exports) {
 var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
 parcelHelpers.defineInteropFlag(exports);
 var _objectFactoryJs = require("./ObjectFactory.js");

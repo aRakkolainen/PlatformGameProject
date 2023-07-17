@@ -1,17 +1,25 @@
+//Sources: Course material + same sources as in previous levels
+
 import Phaser from "phaser";
-let gameData; 
+import moonplatform from "./assets/moonplatform.png";
+import smallmoonplatform from "./assets/smallmoon_platform.png";
+
+let playerData; 
+let data; 
+let enemiesKillScore; 
 let gameConfig;
 let gameOptions; 
 let gameWidth; 
 let gameHeight; 
 let gameScore; 
-import moonplatform from "./assets/moonplatform.png";
-import smallmoonplatform from "./assets/smallmoon_platform.png";
-
+let gunShot; 
+let blingSound; 
+let backgroundMusic;
 export default class LevelScene3 extends Phaser.Scene { 
     constructor() {
       super("LevelScene3");
       this.score=0;
+      this.enemiesKilledScore = 0;
     }
     preload() {
       this.load.image("moonplatform", moonplatform);
@@ -28,6 +36,10 @@ export default class LevelScene3 extends Phaser.Scene {
       this.load.image("star2", "./assets/star2.png");
       this.load.image("star3", "./assets/star3.png");
       this.load.image("star4", "./assets/star4.png");
+      this.load.audio("gunShot", "./assets/gunShot.mp3");
+      this.load.audio("hit", "./assets/hit.mp3");
+      this.load.audio("bling", "./assets/bling.mp3");
+      this.load.audio("background3", "./assets/background3.mp3");
       this.load.image("shootkeys", "./assets/shootkeys.png");
         // Loading the player
         this.load.spritesheet("player", "./assets/player.png", {
@@ -38,17 +50,20 @@ export default class LevelScene3 extends Phaser.Scene {
 
     create(gameData) {
       this.data = gameData; 
+      data = gameData; 
+      playerData = gameData.playerData; 
+      gameScore = playerData.totalScore; 
+      enemiesKillScore = playerData.enemiesKilled;
       gameConfig = gameData.config;
       gameWidth = gameConfig.scale.width; 
       gameHeight = gameConfig.scale.height;
       gameOptions = gameData.options;  
       gameScore = gameData.totalScore; 
-
-    //This is based on this website: https://www.html5gamedevs.com/topic/42460-how-to-stretch-background-image-on-full-screen/
-      //const windowWidth = window.innerWidth; 
-      //const windowHeight = window.innerHeight;
-      //this.background = this.add.image(windowWidth / 2, windowHeight / 2, "background")
-      //this.background.setDisplaySize(windowWidth, windowHeight);
+      // Sound effects: 
+      blingSound = this.sound.add("bling", {loop: false});
+      gunShot = this.sound.add("gunShot", {loop: false});
+      backgroundMusic = this.sound.add("background3", {loop: true});
+      backgroundMusic.play();
       let div = document.getElementById("gameContainer");
       div.style.background= "linear-gradient(#0a0529, #180a5f, #170766, #450181,  #410377, #2b0050, #160129)";
 
@@ -73,7 +88,7 @@ export default class LevelScene3 extends Phaser.Scene {
       this.jump = this.add.text(gameWidth-525, gameHeight-910, "Jump higher", {fontSize:"18px", fill: "#ffffff"});
       this.add.text(gameWidth-525, gameHeight-870, "Shoot", {fontSize:"18px", fill: "#ffffff"});
       this.shoot = this.add.image(gameWidth-570, gameHeight-860, "shootkeys");
-      this.info = this.add.text(gameWidth-470, gameHeight-995, "Collect at least 50 points to succeed!", {fontSize:"20px", fill: "#ffffff", fontStyle:"bold"})
+      this.info = this.add.text(gameWidth-470, gameHeight-995, "Collect at least 150 points to succeed!", {fontSize:"20px", fill: "#ffffff", fontStyle:"bold"})
  
       // Platforms: 
       this.platformGroup = this.physics.add.group({
@@ -93,7 +108,8 @@ export default class LevelScene3 extends Phaser.Scene {
         allowGravity: false
     })
     this.alienGroup = this.physics.add.group({
-      immovable: false, 
+      defaultKey: 'alien', 
+      maxSize: 25, 
       allowGravity: true
     })
 
@@ -122,13 +138,9 @@ export default class LevelScene3 extends Phaser.Scene {
     for(let i = 0; i < smallPlatformNum; i++) {
       this.moonplatformGroup.create(Phaser.Math.Between(210, gameWidth), Phaser.Math.Between(180, gameHeight), "smallmoonPlatform");
     }
-    let alienNum = Phaser.Math.Between(10, 15);
-    /*for(let i = 0; i < alienNum; i++) {
-      this.alien = this.add.spritesheet(Phaser.Math.Between(210, gameWidth), Phaser.Math.Between(180, gameHeight), "alien")
-      //this.alienGroup.create(Phaser.Math.Between(210, gameWidth), Phaser.Math.Between(180, gameHeight), "alien");
-      this.alien.setActive(true);
-      this.alien.setVelocityX(Phaser.Math.Between(-50, 50));
-      this.alien.setVelocityY(Phaser.Math.Between(-50, 50));
+    /*let alienNum = Phaser.Math.Between(10, 15);
+    for(let i = 0; i < alienNum; i++) {
+      this.alienGroup.create(Phaser.Math.Between(210, gameWidth), Phaser.Math.Between(180, gameHeight), "alien");
     }*/
 
 
@@ -140,7 +152,12 @@ export default class LevelScene3 extends Phaser.Scene {
     this.physics.add.collider(this.player, this.moonplatformGroup, this.movePlatform, null, this); 
     this.physics.add.collider(this.player, this.finishLine, this.finishLevel, null, this);
     this.physics.add.collider(this.player, this.endPlatform);
-
+    this.physics.add.overlap(this.player, this.alienGroup, this.enemyAttack, null, this);
+    // Fireballs 
+  this.physics.add.collider(this.fireBalls, this.platformGroup, this.disappear, null, this);
+  this.physics.add.collider(this.fireBalls, this.smallPlatformGroup, this.disappear, null, this);
+  this.physics.add.collider(this.fireBalls, this.moonplatformGroup, this.disappear, null, this);
+  this.physics.add.overlap(this.fireBalls, this.alienGroup, this.enemyKill, null, this);
     // Things to collect: 
     let starNum = Phaser.Math.Between(5, 10);
     let starNum2 = Phaser.Math.Between(7, 14);
@@ -174,27 +191,46 @@ export default class LevelScene3 extends Phaser.Scene {
     this.physics.add.overlap(this.player, this.starGroup4, this.collectStar4, null, this);
     //this.physics.add.collider(this.player, this.skeletonPlatformGroup);
     this.cursors = this.input.keyboard.createCursorKeys();
-  }
 
+    this.timeTrigger = this.time.addEvent({
+      callback: this.makeEnemies, 
+      callbackScope: this, 
+      delay: 750, 
+      loop: true
+    })
+  }
+  makeEnemies(player, start) {
+    let alien = this.alienGroup.get(Phaser.Math.Between(30, gameWidth), Phaser.Math.Between(210, gameHeight));
+    if (alien) {
+      alien.setActive(true);
+      alien.setVelocityX(Phaser.Math.Between(-50, 50)); 
+      alien.setVelocityY(Phaser.Math.Between(-50, 50)); 
+    }
+
+  }
   collectStar1(player, start) {
+    blingSound.play();
     start.disableBody(true, true);
     this.score += 3;  
     this.scoreText.setText(this.score);
   }
 
   collectStar2(player, start) {
+    blingSound.play();
     start.disableBody(true, true);
     this.score += 5;  
     this.scoreText.setText(this.score);
   }
 
   collectStar3(player, start) {
+    blingSound.play();
     start.disableBody(true, true);
     this.score += 15;  
     this.scoreText.setText(this.score)
   }
 
   collectStar4(player, start) {
+    blingSound.play();
     start.disableBody(true, true);
     this.score += 20;  
     this.scoreText.setText(this.score)
@@ -203,6 +239,7 @@ export default class LevelScene3 extends Phaser.Scene {
     shootLeft(player) {
       let fireBall = this.fireBalls.get(this.player.x, this.player.y);
       if (fireBall) {
+        gunShot.play();
         fireBall.setActive(true);
         fireBall.setVisible(true);
         fireBall.body.velocity.x = -200;
@@ -211,24 +248,53 @@ export default class LevelScene3 extends Phaser.Scene {
     shootRight(player) {
       let fireBall = this.fireBalls.get(this.player.x, this.player.y);
       if (fireBall) {
+        gunShot.play();
         fireBall.setActive(true);
         fireBall.setVisible(true);
         fireBall.body.velocity.x = 200;
       }
     }
 
-      finishLevel(player, start, gameData) {
-        if (this.score < 150) {
-          this.info.setText("Collect more points")
-        } else if (this.score >= 1){
+    enemyAttack(player, start) {
+      if (this.score > 0) {
+        this.score-=15;
+        this.scoreText.setText(this.score);
+      }
+      start.body.velocity.y = Phaser.Math.Between(-100, 100);
+      start.body.velocity.x = Phaser.Math.Between(-100, 100);
+      this.enemyMoving = true; 
+      this.player.x = gameWidth/5.5;
+      this.player.y = gameHeight/(1/0.80);
+    }
+
+    enemyKill(player, start) {
+      start.disableBody(true, true);
+      this.score +=15;
+      this.enemiesKilledScore +=1; 
+      this.scoreText.setText(this.score)
+    }
+    disappear(start) {
+      start.disableBody(false, true); 
+    }
+    finishLevel(player, start, data) {
+      if (this.score < 150) {
+        this.info.setText("Collect more points")
+      } else if (this.score >= 150){
           this.info.setText("You won!")
+          blingSound.play();
           this.player.body.velocity.x = 0; 
           this.player.body.velocity.y = 0; 
-          gameScore[2].score = this.score;
+          enemiesKillScore[2].number = this.enemiesKilledScore; 
+          this.total = {
+            name: "Level3", 
+            score: this.score
+          }
+          this.data.playerData.totalScore.push(this.total);
+          backgroundMusic.stop();
           this.scene.start("FinishScene", this.data);
-    
-        }
+  
       }
+    }
     
 
     update() {
@@ -236,21 +302,21 @@ export default class LevelScene3 extends Phaser.Scene {
       if(this.cursors.left.isDown) {
         this.player.body.velocity.x = -gameOptions.playerSpeed;
         this.player.anims.play("left", true);
-    } else if (this.cursors.right.isDown) {
-      this.player.body.velocity.x = gameOptions.playerSpeed;
+      } else if (this.cursors.right.isDown) {
+        this.player.body.velocity.x = gameOptions.playerSpeed;
       this.player.anims.play("right", true);
-    }
-    else   {
-      this.player.body.velocity.x=0; 
-      this.player.anims.play("turn", true);
-    }
-    //Shooting options (First two are shooting while player is moving)
-    if (this.cursors.left.isDown) {
+      }
+      else   {
+        this.player.body.velocity.x=0; 
+        this.player.anims.play("turn", true);
+      }
+  //Shooting options (First two are shooting while player is moving)
+    if (this.cursors.left.isDown && this.cursors.shift.isDown) {
       this.shootLeft();
       this.player.anims.play("shootLeft", true)
     }
 
-    if (this.cursors.right.isDown) {
+    if (this.cursors.right.isDown && this.cursors.shift.isDown) {
       this.shootRight();
       this.player.anims.play("shootRight", true)
     }
@@ -268,32 +334,31 @@ export default class LevelScene3 extends Phaser.Scene {
     this.shootRight();
     this.player.anims.play("shootRight", true)
   }
-    // Based on this website: https://phasergames.com/phaser-3-physics-beginners/
-    this.fireBalls.children.each(function(b) {
-      if (b.active) {
-        if (b.x < 0 || b.x > gameWidth) {
-            b.setActive(false);
-        }
+  // Based on this website: https://phasergames.com/phaser-3-physics-beginners/
+  this.fireBalls.children.each(function(b) {
+    if (b.active) {
+      b.setActive(true);
+      if (b.x < 0 || b.x > gameWidth) {
+          b.setActive(false);
       }
-    }.bind(this));
+    }
+  }.bind(this));
 
 
-    if (this.cursors.up.isDown && this.player.body.touching.down) {
-      this.player.body.velocity.y = -gameOptions.playerGravity/1.6; 
-    }
-
-    if (this.cursors.space.isDown) {
-      this.player.body.velocity.y = -gameOptions.playerGravity/1.6; 
-    }
-    if (this.player.y > gameHeight ) {
-      this.scene.start("LevelScene3");
-      this.score=0;
-    }
-  //this.physics.add.overlap(this.player, this.finish, this.finishLevel, null, this)
-  if (this.player.x > gameWidth || this.player.x < 0) {
-    this.player.x = this.startplatform.x; 
-    this.player.y = this.startplatform.y;
+  if (this.cursors.up.isDown && this.player.body.touching.down) {
+    this.player.body.velocity.y = -gameOptions.playerGravity/1.6; 
   }
-}
 
+  if (this.cursors.space.isDown) {
+    this.player.body.velocity.y = -gameOptions.playerGravity/1.6; 
+  }
+  if (this.player.y > gameHeight ) {
+    this.scene.start("LevelScene3");
+    this.score=0;
+  }
+  if (this.player.x > gameWidth || this.player.x < 0) {
+    this.player.x = gameWidth/5.5;
+    this.player.y = gameHeight/(1/0.80);
+  }
+  }
 }

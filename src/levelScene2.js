@@ -1,18 +1,21 @@
 import Phaser from "phaser";
-let totalPoints; 
-let data;
+let player;
 let gameConfig;
 let gameOptions; 
 let gameWidth; 
 let gameHeight;
 let gameScore;  
-
+let gunShot; 
+let blingSound;
+let enemiesKillScore;
+let backgroundMusic;  
 
 export default class LevelScene2 extends Phaser.Scene { 
     constructor() {
       super("LevelScene2");
       this.score=0;
-      this.enemyMoving=false; 
+      this.enemyMoving=false;
+      this.enemiesKilledScore = 0; 
     }
     preload() {
       // Loading the player
@@ -30,6 +33,9 @@ export default class LevelScene2 extends Phaser.Scene {
       this.load.image("diamond", "./assets/diamond.png");
       this.load.image("stonemonster", "./assets/stonemonster.png");
       this.load.image("finish_line", "./assets/finish.png");
+      this.load.audio("gunShot", "./assets/gunShot.mp3");
+      this.load.audio("bling", "./assets/bling.mp3");
+      this.load.audio("background2", "./assets/background2.mp3");
       this.load.spritesheet("player", "./assets/player.png", {
         frameWidth: 32,
         frameHeight: 48,
@@ -39,12 +45,18 @@ export default class LevelScene2 extends Phaser.Scene {
 
     create(gameData) {
       this.data = gameData;
+      player = gameData.playerData; 
+      gameScore = player.totalScore; 
+      console.log(player);
+      enemiesKillScore = player.enemiesKilled;
       gameConfig =  gameData.config;
       gameWidth = gameConfig.scale.width; 
       gameHeight = gameConfig.scale.height; 
       gameOptions = gameData.options;
-      gameScore = gameData.totalScore; 
-      
+      blingSound = this.sound.add("bling", {loop: false});
+      gunShot = this.sound.add("gunShot", {loop: false});
+      backgroundMusic = this.sound.add("background2", {loop: true});
+      backgroundMusic.play();
       //This is based on this website: https://stackoverflow.com/questions/59332460/how-to-set-background-color-of-phaser-3-game-during-runtime
       let div = document.getElementById("gameContainer");
       div.style.background = div.style.background = "linear-gradient(#113388, #114488, #247899)";
@@ -192,30 +204,35 @@ export default class LevelScene2 extends Phaser.Scene {
       }
     }
     collectCoal(player, start) {
+      blingSound.play();
       start.disableBody(true, true);
       this.score += 1;  
       this.scoreText.setText(this.score)
     }
 
     collectEmerald(player, start) {
+      blingSound.play();
       start.disableBody(true, true);
       this.score += 3;  
       this.scoreText.setText(this.score)
     }
 
     collectTopaz(player, start) {
+      blingSound.play();
       start.disableBody(true, true);
       this.score += 5;  
       this.scoreText.setText(this.score)
     }
 
     collectBlueStone(player, start) {
+      blingSound.play();
       start.disableBody(true, true);
       this.score += 10;  
       this.scoreText.setText(this.score)
     }
 
     collectDiamond(player, start) {
+      blingSound.play();
       start.disableBody(true, true);
       this.score += 15;  
       this.scoreText.setText(this.score)
@@ -227,6 +244,7 @@ export default class LevelScene2 extends Phaser.Scene {
         fireBall.setActive(true);
         fireBall.setVisible(true);
         fireBall.body.velocity.x = -200;
+        gunShot.play(); 
       }
     }
     shootRight(player) {
@@ -235,12 +253,14 @@ export default class LevelScene2 extends Phaser.Scene {
         fireBall.setActive(true);
         fireBall.setVisible(true);
         fireBall.body.velocity.x = 200;
+        gunShot.play(); 
       }
     }
 
     enemyKill(player, start) {
       start.disableBody(true, true);
       this.score +=10;
+      this.enemiesKilledScore += 1; 
       this.scoreText.setText(this.score)
     }
 
@@ -264,14 +284,20 @@ export default class LevelScene2 extends Phaser.Scene {
       start.disableBody(false, true); 
     }
     finishLevel(player, start) {
-      console.log(this.score);
       if (this.score < 100) {
         this.info.setText("Collect more points")
       } else if (this.score >= 100){
           this.info.setText("You won!")
+          blingSound.play();
           this.player.body.velocity.x = 0; 
           this.player.body.velocity.y = 0; 
-          gameScore[1].score = this.score;
+          enemiesKillScore[1].number = this.enemiesKilledScore; 
+          this.totalScore = {
+            name: "Level2", 
+            score: this.score
+          }
+          gameScore.push(this.totalScore);
+          backgroundMusic.stop();
           this.scene.start("LevelScene3", this.data);
   
       }

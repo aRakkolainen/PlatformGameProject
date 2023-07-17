@@ -66,8 +66,11 @@ class BootScene extends Phaser.Scene {
         this.data = {
             config: phaserConfig,
             options: gameOptions, 
-            totalScore : [{name: "level1", score: 0}, {name: "level2", score: 0}, {name: "level3", score: 0}],
-            playerName: ""
+            playerData:  {
+                name: "",
+                totalScore : [], //[{name: "level1", score: 0}, {name: "level2", score: 0}, {name: "level3", score: 0}],
+                enemiesKilled: [{name: "cactus", number: 0}, {name: "stonemonster", number: 0}, {name: "alien", number: 0}]
+            }
         }
         this.scene.start("StartScene", this.data);
     }
