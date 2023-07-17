@@ -1001,6 +1001,6 @@ class LevelScene1 extends (0, _phaserDefault.default).Scene {
 }
 exports.default = LevelScene1;
 
-},{"phaser":"d1pJ3","@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3"}]},["fUYEy","4cF2E"], "4cF2E", "parcelRequireddc7")
+},{"phaser":"d1pJ3","@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3"}]},["fUYEy","4cF2E"], "4cF2E", "parcelRequirecd09")
 
 //# sourceMappingURL=game.7c5efd08.js.map

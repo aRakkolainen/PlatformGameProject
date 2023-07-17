@@ -73,7 +73,7 @@ export default class LevelScene3 extends Phaser.Scene {
       const star1 = this.physics.add.image(gameWidth-770, gameHeight-940, "star1");
       this.add.text(gameWidth-755, gameHeight-950, "3 points ", {fontSize:"20px", fill: "#ffffff", fontStyle:"bold"})
       this.add.text(gameWidth-755, gameHeight-910, "5 points", {fontSize:"20px", fill: "#ffffff", fontStyle:"bold"})
-      const star2 = this.physics.add.image(gameWidth-770, gameHeight-100, "star2")
+      const star2 = this.physics.add.image(gameWidth-770, gameHeight-900, "star2")
       this.add.text(gameWidth-755, gameHeight-860, "10 points", {fontSize:"20px", fill: "#ffffff", fontStyle:"bold"})
       const star3 = this.physics.add.image(gameWidth-770, gameHeight-860, "star3")
       this.add.text(gameWidth-755, gameHeight-810, "20 points", {fontSize:"20px", fill: "#ffffff", fontStyle:"bold"})

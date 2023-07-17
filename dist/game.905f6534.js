@@ -745,7 +745,7 @@ class LevelScene3 extends (0, _phaserDefault.default).Scene {
             fill: "#ffffff",
             fontStyle: "bold"
         });
-        const star2 = this.physics.add.image(gameWidth - 770, gameHeight - 100, "star2");
+        const star2 = this.physics.add.image(gameWidth - 770, gameHeight - 900, "star2");
         this.add.text(gameWidth - 755, gameHeight - 860, "10 points", {
             fontSize: "20px",
             fill: "#ffffff",
@@ -1060,6 +1060,6 @@ exports.getOrigin = getOrigin;
 },{}],"8LWmS":[function(require,module,exports) {
 module.exports = require("7d3eee754efad779").getBundleURL("kLn1y") + "smallmoon_platform.ccf4245b.png" + "?" + Date.now();
 
-},{"7d3eee754efad779":"lgJ39"}],"lW6qc":[function() {},{}]},["fjhts","5JiMD"], "5JiMD", "parcelRequireddc7")
+},{"7d3eee754efad779":"lgJ39"}],"lW6qc":[function() {},{}]},["fjhts","5JiMD"], "5JiMD", "parcelRequirecd09")
 
 //# sourceMappingURL=game.905f6534.js.map
