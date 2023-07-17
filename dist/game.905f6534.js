@@ -574,7 +574,7 @@ function hmrAccept(bundle /*: ParcelRequire */ , id /*: string */ ) {
 }
 
 },{}],"5JiMD":[function(require,module,exports) {
-//Source for this was course material and Leevi Lautanen
+//Source for this was course material and Leevi Lautanen gave hint for using BootScene and starting new Scene with parameters
 // Including the form for asking player to insert username: https://www.thepolyglotdeveloper.com/2020/09/accept-text-input-user-phaser-game/
 var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
 var _startScene = require("./src/startScene");
