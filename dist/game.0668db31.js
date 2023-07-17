@@ -706,6 +706,6 @@ class FinishScene extends (0, _phaserDefault.default).Scene {
 }
 exports.default = FinishScene;
 
-},{"phaser":"d1pJ3","@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3"}]},["bJnfC","5rk9W"], "5rk9W", "parcelRequirecd09")
+},{"phaser":"d1pJ3","@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3"}]},["bJnfC","5rk9W"], "5rk9W", "parcelRequireddc7")
 
 //# sourceMappingURL=game.0668db31.js.map

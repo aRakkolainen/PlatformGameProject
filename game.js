@@ -1,12 +1,11 @@
 //Source for this was course material and Leevi Lautanen
 // Including the form for asking player to insert username: https://www.thepolyglotdeveloper.com/2020/09/accept-text-input-user-phaser-game/
-// How to get user input with Phaser 3 plugin called rexUI: https://blog.ourcade.co/posts/2020/phaser-3-add-text-input-rexui/
+
 import StartScene from "./src/startScene";
 import LevelScene1 from "./src/levelScene1";
 import LevelScene2 from "./src/levelScene2";
 import LevelScene3 from "./src/levelScene3";
 import FinishScene from "./src/finishScene";
-import RexUIPlugin from 'phaser3-rex-plugins/templates/ui/ui-plugin';
 import "./src/styles.css";
 import Phaser from "phaser";
 let game;
