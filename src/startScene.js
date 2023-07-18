@@ -3,7 +3,7 @@
 How to get user input in Phaser: https://www.thepolyglotdeveloper.com/2020/09/accept-text-input-user-phaser-game/ 
 https://www.youtube.com/watch?v=z7pWdGFBld0
 */
-import Phaser from "phaser";
+//import Phaser from "phaser";
 
 let gameConfig; 
 let usernameInput; 

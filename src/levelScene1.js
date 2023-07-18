@@ -12,7 +12,7 @@
 
 //import "./styles.css";
 //let game; 
-import Phaser from "phaser"; 
+//import Phaser from "phaser"; 
 let gameConfig;
 let gameOptions; 
 let gameWidth; 

@@ -1,6 +1,6 @@
 //Sources: Course material + same sources as in previous levels
 
-import Phaser from "phaser";
+//import Phaser from "phaser";
 import moonplatform from "./assets/moonplatform.png";
 import smallmoonplatform from "./assets/smallmoon_platform.png";
 

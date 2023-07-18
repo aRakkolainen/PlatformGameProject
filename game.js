@@ -7,7 +7,7 @@ import LevelScene2 from "./src/levelScene2";
 import LevelScene3 from "./src/levelScene3";
 import FinishScene from "./src/finishScene";
 import "./src/styles.css";
-import Phaser from "phaser";
+//import Phaser from "phaser";
 let game;
 let phaserConfig;  
 window.onload = () => {
