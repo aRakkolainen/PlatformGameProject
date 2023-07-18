@@ -643,7 +643,7 @@ class FinishScene extends Phaser.Scene {
             fontSize: "30px",
             fill: "#ffffff"
         });
-        this.add.text(gameWidth / 8, gameHeight / 3.25, "ENEMIES KILLED: " + enemiesKillScore[0].number, {
+        this.add.text(gameWidth / 8, gameHeight / 3.27, "ENEMIES KILLED: " + enemiesKillScore[0].number, {
             fontSize: "30px",
             fill: "#ffffff"
         });

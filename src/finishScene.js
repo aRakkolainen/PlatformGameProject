@@ -38,7 +38,7 @@ export default class FinishScene extends Phaser.Scene {
       this.add.text(gameWidth/8, gameHeight/4.75, "----------------------------------------------------------------",  {fill: "#ffffff"})
       this.add.text(gameWidth/8, gameHeight/4.4, "LEVEL 1", {fontSize:"35px", fill: "#ffffff", fontStyle:"bold"}); 
       this.add.text(gameWidth/8, gameHeight/3.75, "SCORE: " + gameScore[0].score, {fontSize:"30px", fill: "#ffffff"}); 
-      this.add.text(gameWidth/8, gameHeight/3.25, "ENEMIES KILLED: " + enemiesKillScore[0].number, {fontSize:"30px", fill: "#ffffff"}); 
+      this.add.text(gameWidth/8, gameHeight/3.27, "ENEMIES KILLED: " + enemiesKillScore[0].number, {fontSize:"30px", fill: "#ffffff"}); 
       this.add.text(gameWidth/8, gameHeight/3, "----------------------------------------------------------------",  {fill: "#ffffff"})
       this.add.text(gameWidth/8, gameHeight/2.85, "LEVEL 2", {fontSize:"35px", fill: "#ffffff", fontStyle:"bold"}); 
       this.add.text(gameWidth/8, gameHeight/2.55, "SCORE: " + gameScore[1].score, {fontSize:"30px", fill: "#ffffff"}); 
